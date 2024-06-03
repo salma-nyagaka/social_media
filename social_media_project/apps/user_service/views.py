@@ -54,7 +54,7 @@ class UserViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             serializer.save()
             context = {
-                "message": "Your account has been created successfuly. Kindly  activate your account by the link sent to your email",
+                "message": "Your account has been successfully created. Please activate your account by clicking the link sent to your email.",
                 "data": serializer.data,
             }
             return Response(context, status=status.HTTP_201_CREATED)
@@ -157,11 +157,11 @@ def activate_account(request, token):
         if timezone.now() <= exp_aware:
             user.is_active = True
             user.save()
-            activation_status = "Your account has been activated successfully."
+            activation_status = {"message":"Your account has been activated successfully.", "status":status.HTTP_200_OK}
         else:
-            activation_status = "Activation link has expired."
+            activation_status = {"message":"Activation link has expired.", "status":status.HTTP_400_BAD_REQUEST}
     else:
-        activation_status = "User account does not exist"
+        activation_status ={"message":"User does not exist", "status":status.HTTP_404_NOT_FOUND}
 
     context = {"activation_status": activation_status}
 
