@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Activation Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            font-size:20px;
+        }
+        p {
+            font-size: 14px;
+            color: #666;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Activation Status</h1>
+        {% if activation_status.status != 200 %}
+            <p class="error">{{ activation_status.message }}</p>
+        {% else %}
+            <p class="success">{{ activation_status.message }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
