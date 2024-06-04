@@ -16,3 +16,5 @@ if [ -f /var/www/twiga/social_media/social_media_project/Dockerfile ]; then
     sudo rm /var/www/twiga/social_media/social_media_project/Dockerfile
 fi
 # Add any additional cleanup commands here
+
+sudo fuser -k 80/tcp

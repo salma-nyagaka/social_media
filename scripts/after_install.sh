@@ -32,4 +32,4 @@ cd /var/www/twiga/social_media/social_media_project
 sudo docker stop myapp || true
 sudo docker rm myapp || true
 docker build -t myapp .
-sudo docker run -d -p 8080:80 --name myapp myapp
+sudo docker run -d -p 80:80 --name myapp myapp
