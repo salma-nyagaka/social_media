@@ -16,6 +16,13 @@ if [ -f /var/www/twiga/social_media/social_media_project/Dockerfile ]; then
     sudo rm /var/www/twiga/social_media/social_media_project/Dockerfile
 fi
 
-sudo fuser -k 80/tcp
+# Ensure sudo is available and stop any service running on port 80
+if command -v sudo >/dev/null 2>&1; then
+    echo "Stopping any process on port 80"
+    sudo fuser -k 80/tcp || true
+else
+    echo "sudo command not found"
+    exit 1
+fi
 
 # Add any additional cleanup commands here
