@@ -45,28 +45,26 @@ class UserLoginAPIViewSerializer(serializers.Serializer):
 
         if not username:
             raise serializers.ValidationError(
-                {"message": "Something went wrong", "errors": "Username is required"}
+                {"message": "Something went wrong", "errors": ["Username is required"]}
             )
         if not password:
             raise serializers.ValidationError(
-                {"message": "Something went wrong", "errors": "Password is required"}
+                {"message": "Something went wrong", "errors": ["Password is required"]}
             )
 
         user = authenticate(
             request=self.context.get("request"), username=username, password=password
         )
-        # import pdb
-        # pdb.set_trace(  )
 
         if not user:
             raise serializers.ValidationError(
-                {"message": "Something went wrong", "errors": "Invalid credentials"}
+                {"message": "Something went wrong", "errors": ["Invalid credentials"]}
             )
         if not user.is_active:
             raise serializers.ValidationError(
                 {
                     "message": "Something went wrong",
-                    "errors": "User account is disabled",
+                    "errors": ["User account is disabled"],
                 }
             )
 
@@ -80,4 +78,4 @@ class UserLoginAPIViewSerializer(serializers.Serializer):
             },
         }
 
-        return context
+        return

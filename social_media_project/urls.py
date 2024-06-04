@@ -23,5 +23,4 @@ urlpatterns = [
     path("users/", include("social_media_project.apps.user_service.urls")),
     path("blogs/", include("social_media_project.apps.post_service.urls")),
     path("n/", include("social_media_project.apps.notification_service.urls")),
-
 ]

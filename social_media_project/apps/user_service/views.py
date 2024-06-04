@@ -20,6 +20,7 @@ from .serializers import (
 )
 from .models import User
 
+
 class UserViewSet(viewsets.ViewSet):
     queryset = User.objects.all()
 
@@ -133,7 +134,9 @@ class UserLoginAPIView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        serializer = UserLoginAPIViewSerializer(data=request.data, context={'request': request})
+        serializer = UserLoginAPIViewSerializer(
+            data=request.data, context={"request": request}
+        )
         if serializer.is_valid(raise_exception=True):
             return Response(serializer.validated_data, status=status.HTTP_200_OK)
         context = {"message": "Something went wrong", "errors": serializer.errors}
@@ -155,11 +158,20 @@ def activate_account(request, token):
         if timezone.now() <= exp_aware:
             user.is_active = True
             user.save()
-            activation_status = {"message":"Your account has been activated successfully.", "status":status.HTTP_200_OK}
+            activation_status = {
+                "message": "Your account has been activated successfully.",
+                "status": status.HTTP_200_OK,
+            }
         else:
-            activation_status = {"message":"Activation link has expired.", "status":status.HTTP_400_BAD_REQUEST}
+            activation_status = {
+                "message": "Activation link has expired.",
+                "status": status.HTTP_400_BAD_REQUEST,
+            }
     else:
-        activation_status ={"message":"User does not exist", "status":status.HTTP_404_NOT_FOUND}
+        activation_status = {
+            "message": "User does not exist",
+            "status": status.HTTP_404_NOT_FOUND,
+        }
 
     context = {"activation_status": activation_status}
 
