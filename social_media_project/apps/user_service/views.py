@@ -2,10 +2,7 @@ import jwt
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import User
-from rest_framework import status, views
 from rest_framework.response import Response
-from rest_framework.decorators import action
-from django.utils import timezone
 from datetime import datetime
 from django.utils.timezone import make_aware
 from django.shortcuts import render
@@ -14,7 +11,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from django.urls import reverse
 
 from .serializers import (
     UserSerializer,
@@ -78,24 +74,24 @@ class UserViewSet(viewsets.ViewSet):
         }
         return Response(context, status=status.HTTP_200_OK)
 
-    def update(self, request, pk=None):
-        try:
-            user = User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = UserUpdateSerializer(user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            serializer = UserSerializer(user)
-            context = {
-                "message": "You have successfully updated user data",
-                "data": serializer.data,
-            }
-            return Response(context, status=status.HTTP_200_OK)
-        context = {"message": "Something went wrong", "error": serializer.errors}
-        return Response(context, status=status.HTTP_400_BAD_REQUEST)
+    # def update(self, request, pk=None):
+    #     try:
+    #         user = User.objects.get(pk=pk)
+    #     except User.DoesNotExist:
+    #         return Response(status=status.HTTP_404_NOT_FOUND)
+    #     serializer = UserUpdateSerializer(user, data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         serializer = UserSerializer(user)
+    #         context = {
+    #             "message": "You have successfully updated user data",
+    #             "data": serializer.data,
+    #         }
+    #         return Response(context, status=status.HTTP_200_OK)
+    #     context = {"message": "Something went wrong", "error": serializer.errors}
+    #     return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
-    def partial_update(self, request, pk=None):
+    def update_user(self, request, pk=None):
         try:
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
@@ -128,8 +124,7 @@ class UserViewSet(viewsets.ViewSet):
         context = {"message": "You have successfully deleted the user data"}
         return Response(context, status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
-    def me(self, request):
+    def get_current_user(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
@@ -141,7 +136,8 @@ class UserLoginAPIView(APIView):
         serializer = UserLoginAPIViewSerializer(data=request.data, context={'request': request})
         if serializer.is_valid(raise_exception=True):
             return Response(serializer.validated_data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        context = {"message": "Something went wrong", "errors": serializer.errors}
+        return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
