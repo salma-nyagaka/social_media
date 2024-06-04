@@ -1,3 +1,7 @@
+from celery import shared_task
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -19,6 +23,7 @@ from datetime import datetime, timedelta
 secret = settings.SECRET_KEY
 
 
+@shared_task
 def send_activation_email(user):
     # uidb64 = urlsafe_base64_encode(force_bytes(user.id))
     payload = {
@@ -44,3 +49,32 @@ def send_activation_email(user):
     to = user.email
 
     send_mail(subject, plain_message, from_email, [to], html_message=html_message)
+
+
+@shared_task
+def send_email_task(
+    subject,
+    message,
+    from_email,
+    recipient_list,
+    html_template=None,
+    context=None,
+    bcc=None,
+):
+    if html_template:
+        if context is None:
+            context = {}
+        context["message"] = message
+        html_content = render_to_string(html_template, context)
+        text_content = strip_tags(html_content)
+    else:
+        html_content = message
+        text_content = strip_tags(message)
+
+    email = EmailMultiAlternatives(
+        subject, text_content, from_email, recipient_list, bcc=bcc
+    )
+    if html_template:
+        email.attach_alternative(html_content, "text/html")
+
+    email.send()

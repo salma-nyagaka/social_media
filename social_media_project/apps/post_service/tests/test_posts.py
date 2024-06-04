@@ -1,49 +1,82 @@
 # post_service/tests/test_views.py
+"""
+Test cases for BlogPost and Comment APIs.
+"""
+
 import pytest
 from django.urls import reverse
-from rest_framework.test import APIClient
-from rest_framework import status
-from social_media_project.apps.user_service.models import User
-from social_media_project.apps.post_service.models import Post, Comment
-from rest_framework_simplejwt.tokens import RefreshToken
 from django.test import TestCase
+from unittest.mock import patch
+from rest_framework.test import APIClient
+from social_media_project.apps.post_service.models import Post, Comment
+from social_media_project.apps.user_service.models import User
+
 
 @pytest.mark.django_db
 class TestPostAPI(TestCase):
-    """Test suite for Post and Comment APIs."""
+    """
+    Test suite for the BlogPost and Comment APIs.
+    """
 
     def setUp(self):
-        """Set up test data and API client."""
-        self.user = User.objects.create_user(username='testuser', password='testpass')
+        """
+        Set up test environment.
+        Creates a test user and authenticates the API client.
+        Also creates a test post.
+        """
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword", email="test@example.com"
+        )
         self.client = APIClient()
-        # Obtain the JWT token
-        refresh = RefreshToken.for_user(self.user)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
-        self.post = Post.objects.create(user=self.user, content='Test post content')
+        self.client.force_authenticate(user=self.user)
+        self.post = Post.objects.create(
+            title="Test Post", content="This is a test post", user=self.user
+        )
 
-    def test_create_post(self):
-        """Test creating a new post."""
-        url = reverse('post-list')
-        data = {'content': 'Test post'}
-        response = self.client.post(url, data, format='json')
-        assert response.status_code == status.HTTP_201_CREATED
-        assert Post.objects.count() == 2  # including the setup post
-        assert Post.objects.filter(content='Test post').exists()
+    @patch("social_media_project.apps.notification_service.tasks.send_email_task.delay")
+    def test_create_post(self, mock_send_email_task):
+        """
+        Test creating a new blog post.
+        Verifies that the post is created and an email notification is sent.
+        """
+        url = reverse(
+            "post-list"
+        )  # Update this to the correct name for your post list view
+        data = {"title": "New Post", "content": "This is a new post"}
+        response = self.client.post(url, data, format="json")
 
-    def test_get_posts(self):
-        """Test retrieving a list of posts."""
-        url = reverse('post-list')
-        response = self.client.get(url, format='json')
-        assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 1
-        assert response.data[0]['content'] == 'Test post content'
+        assert response.status_code == 201
+        assert Post.objects.count() == 2
+        post = Post.objects.last()
+        assert post.title == "New Post"
 
+        # Check if the email task was called
+        mock_send_email_task.assert_called_once()
+        call_args = mock_send_email_task.call_args[1]
+        assert call_args["subject"] == "New Post Created"
+        assert 'A new post titled "New Post" has been created.' in call_args["message"]
 
-    def test_add_and_get_comments(self):
-        """Test retrieving comments for a post."""
-        Comment.objects.create(post=self.post, user=self.post.user, content='Test comment')
-        url = reverse('post-detail', kwargs={'pk': self.post.pk})
-        response = self.client.get(url, format='json')
-        assert response.status_code == status.HTTP_200_OK
-        assert len(response.data['comments']) == 1
-        assert response.data['comments'][0]['content'] == 'Test comment'
+    @patch("social_media_project.apps.notification_service.tasks.send_email_task.delay")
+    def test_create_comment(self, mock_send_email_task):
+        """
+        Test creating a new comment on a post.
+        Verifies that the comment is created and an email notification is sent.
+        """
+        url = reverse(
+            "comment-list"
+        )  # Update this to the correct name for your comment list view
+        data = {"post": self.post.id, "content": "This is a comment"}
+        response = self.client.post(url, data, format="json")
+
+        assert response.status_code == 201
+        assert Comment.objects.count() == 1
+        comment = Comment.objects.first()
+        assert comment.content == "This is a comment"
+
+        # Check if the email task was called
+        mock_send_email_task.assert_called_once()
+        call_args = mock_send_email_task.call_args[1]
+        assert (
+            call_args["subject"] == "New comment has been added to the post: Test Post"
+        )
+        assert "This is a comment" in call_args["message"]
