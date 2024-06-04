@@ -28,5 +28,8 @@
 #!/bin/bash
 echo "After install script running..."
 cd /var/www/twiga/social_media/social_media_project
+# Stop and remove any running container to avoid conflicts
+sudo docker stop myapp || true
+sudo docker rm myapp || true
 docker build -t myapp .
-docker run -d -p 80:80 myapp
+sudo docker run -d -p 8080:80 --name myapp myapp
