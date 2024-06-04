@@ -15,4 +15,7 @@ echo "Before install script running..."
 if [ -f /var/www/twiga/social_media/social_media_project/Dockerfile ]; then
     sudo rm /var/www/twiga/social_media/social_media_project/Dockerfile
 fi
+
+sudo fuser -k 80/tcp
+
 # Add any additional cleanup commands here
