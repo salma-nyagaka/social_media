@@ -39,12 +39,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    
+    'channels',
     "rest_framework",
     "rest_framework_simplejwt",
     "social_media_project.apps.user_service",
     "social_media_project.apps.post_service",
-
+    "social_media_project.apps.notification_service",
 ]
 
 MIDDLEWARE = [
@@ -176,3 +176,17 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "salmanyagaka@gmail.com"
 EMAIL_HOST_PASSWORD = "oycj urnx ceiw rexn"
+DEFAULT_FROM_EMAIL = 'salmanyagaka@gmail.com'
+
+
+KAFKA_SERVER = '127.0.0.1:9092'
+ASGI_APPLICATION = 'social_media_project.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        },
+    },
+}

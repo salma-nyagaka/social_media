@@ -7,7 +7,6 @@ router = DefaultRouter()
 router.register(r'posts', BlogPostViewSet)
 router.register(r'comments', CommentViewSet)
 
-print(router.urls)
 
 urlpatterns = [
     path('', include(router.urls)),

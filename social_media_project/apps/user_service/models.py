@@ -4,7 +4,7 @@ from django.db import models
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
-    is_active = models.EmailField(default=False)
+    is_active = models.BooleanField(default=False)
     # activation_expiry = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -22,5 +22,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("users/", include("social_media_project.apps.user_service.urls")),
     path("posts/", include("social_media_project.apps.post_service.urls")),
+    path("n/", include("social_media_project.apps.notification_service.urls")),
 
 ]

@@ -25,10 +25,7 @@ def send_activation_email(user):
         "email": user.email,
         "exp": (timezone.now() + timezone.timedelta(hours=24)).timestamp(),
     }
-    # token = jwt.encode(payload, secret, algorithm="HS256")
-    # refresh = RefreshToken.for_user(user)
-    # import pdb
-    # pdb.set_trace()
+
     exp = datetime.utcnow() + timedelta(hours=24)
     token = jwt.encode(
         {"user_id": user.id, "exp": exp}, settings.SECRET_KEY, algorithm="HS256"
