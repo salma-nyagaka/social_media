@@ -6,6 +6,7 @@ from django.db import transaction
 from django.contrib.sites.shortcuts import get_current_site
 from .utils import send_activation_email
 from .models import User
+from ..notification_service.tasks import send_activation_email
 
 
 class UserSerializer(serializers.ModelSerializer):

@@ -14,6 +14,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from django.urls import reverse
 
 from .serializers import (
     UserSerializer,
@@ -22,7 +23,6 @@ from .serializers import (
     UserLoginAPIViewSerializer,
 )
 from .models import User
-
 
 class UserViewSet(viewsets.ViewSet):
     queryset = User.objects.all()

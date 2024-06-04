@@ -39,12 +39,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'channels',
     "rest_framework",
     "rest_framework_simplejwt",
     "social_media_project.apps.user_service",
     "social_media_project.apps.post_service",
     "social_media_project.apps.notification_service",
+    # "django-celery-results",
 ]
 
 MIDDLEWARE = [
@@ -179,14 +179,26 @@ EMAIL_HOST_PASSWORD = "oycj urnx ceiw rexn"
 DEFAULT_FROM_EMAIL = 'salmanyagaka@gmail.com'
 
 
-KAFKA_SERVER = '127.0.0.1:9092'
-ASGI_APPLICATION = 'social_media_project.asgi.application'
+# KAFKA_SERVER = '127.0.0.1:9092'
+# ASGI_APPLICATION = 'social_media_project.asgi.application'
 
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)],
-        },
-    },
-}
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             'hosts': [('127.0.0.1', 6379)],
+#         },
+#     }
+# 
+# 
+# 
+# ,
+# }
+
+# settings.py
+CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_RESULT_BACKEND = 'rpc://'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
