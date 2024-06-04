@@ -1,23 +1,23 @@
-# Dockerfile
+# Use an official Python runtime as a parent image
 FROM python:3.12.1-slim
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the dependencies file to the working directory
-COPY requirements.txt .
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-# Install any dependencies
-RUN pip install -r requirements.txt
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the content of the local directory to the working directory
-COPY . .
+# Ensure gunicorn is installed
+RUN pip install gunicorn
 
-# Expose the port the app runs on
-EXPOSE 8000
+# Make port 80 available to the world outside this container
+EXPOSE 80
 
 # Define environment variable
 ENV NAME World
 
-# Run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "social_media_project.wsgi:application"]
+# Run gunicorn when the container launches
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "myapp.wsgi:application"]
