@@ -1,0 +1,21 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Deploy to AWS CodeDeploy
+      uses: aws-actions/aws-code-deploy@v2.0.0
+      with:
+        application-name: my-application
+        deployment-group-name: my-deployment-group
+        deployment-config-name: CodeDeployDefault.OneAtATime
+        github-token: ${{ secrets.GITHUB_TOKEN }}
