@@ -27,7 +27,10 @@ SECRET_KEY = "django-insecure-xi@@*gceecx#9^^311qpn6#l-e=ydu!5#9uxjrna5=7fw*ch^^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ROOT_URLCONF = 'social_media_project.urls'
+
+
+ALLOWED_HOSTS = ['52.90.160.169', '127.0.0.1:8000']
 
 
 # Application definition
