@@ -85,12 +85,14 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "social_media_project",
-        "USER": "salmanyagaka",
-        "PASSWORD": "password",
+        "USER": "social_media_project",
+        "PASSWORD": "social_media_project",
         "HOST": "localhost",
         "PORT": "5432",
     }
 }
+
+
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
