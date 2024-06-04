@@ -41,12 +41,10 @@ echo "After install script running..."
 cd /var/www/twiga/social_media/social_media_project
 
 # Stop and remove any running container to avoid conflicts
-container_id=$(sudo docker ps -q --filter "name=myapp")
-if [ -n "$container_id" ]; then
-    echo "Stopping and removing existing container"
-    sudo docker stop myapp
-    sudo docker rm myapp
-fi
+
+sudo docker stop myapp
+sudo docker rm myapp
+
 
 # Build and run the new Docker container on a different port, e.g., 8080
 sudo docker build -t myapp .
