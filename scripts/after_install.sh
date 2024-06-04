@@ -26,10 +26,28 @@
 # # Run a new container with the latest image
 # docker run -d --name django-app-container -p 80:80 django-app:latest
 #!/bin/bash
+# echo "After install script running..."
+# cd /var/www/twiga/social_media/social_media_project
+# # Stop and remove any running container to avoid conflicts
+# sudo docker stop myapp || true
+# sudo docker rm myapp || true
+# docker build -t myapp .
+# sudo docker run -d -p 80:80 --name myapp myapp
+
+
+#!/bin/bash
 echo "After install script running..."
 cd /var/www/twiga/social_media/social_media_project
+
 # Stop and remove any running container to avoid conflicts
-sudo docker stop myapp || true
-sudo docker rm myapp || true
-docker build -t myapp .
+container_id=$(sudo docker ps -q --filter "name=myapp")
+if [ -n "$container_id" ]; then
+    echo "Stopping and removing existing container"
+    sudo docker stop myapp
+    sudo docker rm myapp
+fi
+
+# Build and run the new Docker container
+sudo docker build -t myapp .
 sudo docker run -d -p 80:80 --name myapp myapp
+
