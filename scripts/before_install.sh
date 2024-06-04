@@ -13,6 +13,6 @@
 echo "Before install script running..."
 # Remove existing files if they exist
 if [ -f /var/www/twiga/social_media/social_media_project/Dockerfile ]; then
-    rm /var/www/twiga/social_media/social_media_project/Dockerfile
+    sudo rm /var/www/twiga/social_media/social_media_project/Dockerfile
 fi
 # Add any additional cleanup commands here
