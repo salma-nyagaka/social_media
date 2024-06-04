@@ -57,7 +57,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "social_media_project.urls"
 
 TEMPLATES = [
     {
@@ -85,13 +84,12 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "social_media_project",
-        "USER": "social_media_project",
-        "PASSWORD": "social_media_project",
+        "USER": "salmanyagaka",
+        "PASSWORD": "password",
         "HOST": "localhost",
         "PORT": "5432",
     }
 }
-
 
 
 REST_FRAMEWORK = {
