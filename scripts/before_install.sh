@@ -26,3 +26,6 @@ else
 fi
 
 # Add any additional cleanup commands here
+# Add any additional cleanup commands here
+docker stop $(docker ps -q) || true
+docker rm $(docker ps -a -q) || true
