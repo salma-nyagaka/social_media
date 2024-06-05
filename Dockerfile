@@ -31,7 +31,7 @@
 # CMD ["gunicorn", "--bind", "0.0.0.0:8000", "social_media_project.wsgi:application"]
 
 # Use an official Python runtime as a parent image
-FROM python:3.12.1-slim
+FROM python:3.12-slim
 
 # Set the working directory in the container
 WORKDIR /app
