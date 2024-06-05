@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /opt/twiga/social_media/social_media_project
+    destination: /home/ubuntu/opt/twiga/social_media/social_media_project
 hooks:
   BeforeInstall:
     - location: scripts/before_install.sh
