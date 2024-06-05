@@ -24,4 +24,4 @@ EXPOSE 80
 ENV NAME World
 
 # Run gunicorn when the container launches
-CMD ["gunicorn", "--bind", "0.0.0.0:80", "social_media_project.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "social_media_project.wsgi:application"]
