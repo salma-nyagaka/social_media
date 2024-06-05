@@ -8,44 +8,12 @@ from django.utils.html import strip_tags
 from django.conf import settings
 import html2text
 
-
 from .models import Notification
 from social_media_project.apps.user_service.models import User
 
-
-@shared_task
-def send_email_task(
-    subject,
-    message,
-    from_email,
-    recipient_list,
-    html_template=None,
-    context=None,
-    bcc=None,
-):
-    if html_template:
-        if context is None:
-            context = {}
-        context["message"] = message
-        html_content = render_to_string(html_template, context)
-        text_content = strip_tags(html_content)
-    else:
-        html_content = message
-        text_content = strip_tags(message)
-
-    email = EmailMultiAlternatives(
-        subject, text_content, from_email, recipient_list, bcc=bcc
-    )
-    if html_template:
-        email.attach_alternative(html_content, "text/html")
-
-    email.send()
-
-
-# from .models import User
 import math
 
-BATCH_SIZE = 100  # Adjust batch size as needed
+BATCH_SIZE = 100 
 
 
 @shared_task

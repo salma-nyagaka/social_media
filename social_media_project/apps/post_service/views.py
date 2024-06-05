@@ -7,7 +7,7 @@ from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
 
 # from social_media_project.apps.notification_service.kafka_utils import send_notification_to_kafka
-from ..notification_service.tasks import send_email_task, send_batch_notifications
+from ..notification_service.tasks import send_batch_notifications
 from ..user_service.models import User
 from django.conf import settings
 
@@ -38,15 +38,15 @@ class BlogPostViewSet(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         try:
             post = Post.objects.get(pk=pk)
+            serializer = PostSerializer(post)
+            response_data = {
+                "message": "Post retrieved successfully",
+                "data": serializer.data,
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
         except Post.DoesNotExist as e:
             error_response = {"message": "Something went wrong", "errors": str(e)}
             return Response(error_response, status=status.HTTP_404_NOT_FOUND)
-        serializer = PostSerializer(post)
-        response_data = {
-            "message": "Post retriEved successfully",
-            "data": serializer.data,
-        }
-        return Response(response_data, status=status.HTTP_200_OK)
 
     def update(self, request, pk=None):
         try:
@@ -75,9 +75,6 @@ class BlogPostViewSet(viewsets.ViewSet):
         except Post.DoesNotExist as e:
             error_response = {"message": "Something went wrong", "errors": str(e)}
             return Response(error_response, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            error_response = {"message": "Something went wrong", "errors": str(e)}
-            return Response(error_response, status=status.HTTP_404_NOT_FOUND)
 
         post.delete()
         response_data = {"message": "Post deleted successfully"}
@@ -87,34 +84,30 @@ class BlogPostViewSet(viewsets.ViewSet):
         """
         Save the post with the current user as the author and send notifications.
         """
-        try:
-            title = serializer.validated_data.get("title", "No topic")
-            post_id = serializer.validated_data.get("id", "No id")
-            if title:
-                receiver_emails = list(
-                    User.objects.filter(is_active=True).values_list("email", flat=True)
-                )
-                # Send email notification after post is created
-                send_batch_notifications.delay(
-                    subject="New Post Created",
-                    message=f'A new post titled "{title}" has been created.',
-                    recipient_list=receiver_emails,
-                    context={
-                        "post_url": "{}/blogs/{}/".format(settings.DOMAIN_NAME, post_id)
-                    },
-                    html_template="new_post.html",
-                    notification_type="post",
-                )
-            post = serializer.save(user=self.request.user)
-            response_data = {
-                "message": "Post created successfully",
-                "data": serializer.data,
-            }
-            return Response(response_data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            error_response = {"message": "Something went wrong", "errors": str(e)}
-            return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
-
+        title = serializer.validated_data.get("title", "No topic")
+        post_id = serializer.validated_data.get("id", "No id")
+        if title:
+            receiver_emails = list(
+                User.objects.filter(is_active=True).values_list("email", flat=True)
+            )
+            # Send email notification after post is created
+            send_batch_notifications.delay(
+                subject="New Post Created",
+                message=f'A new post titled "{title}" has been created.',
+                recipient_list=receiver_emails,
+                context={
+                    "post_url": "{}/blogs/{}/".format(settings.DOMAIN_NAME, post_id)
+                },
+                html_template="new_post.html",
+                notification_type="post",
+            )
+        post = serializer.save(user=self.request.user)
+        response_data = {
+            "message": "Post created successfully",
+            "data": serializer.data,
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
+   
 
 class CommentViewSet(viewsets.ViewSet):
     """

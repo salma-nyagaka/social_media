@@ -7,7 +7,15 @@ from social_media_project.apps.post_service.models import User, Post, Comment
 
 @pytest.mark.django_db
 class TestBlogPostAPI:
+    """
+    Test suite for the Blog Post API endpoints.
+    """
+
     def setup_method(self):
+        """
+        Setup method to initialize the test client, create a test user, a post, and a comment.
+        This fixture runs before each test method.
+        """
         self.client = APIClient()
         self.user = User.objects.create_user(
             username="testuser",
@@ -25,73 +33,124 @@ class TestBlogPostAPI:
         )
 
     def test_list_posts(self):
+        """
+        Test listing all posts.
+        """
         url = reverse("retrieve_all")
         response = self.client.get(url)
+        
         assert response.status_code == status.HTTP_200_OK
         assert "data" in response.data
         assert response.data["message"] == "Post retrieved successfully"
 
     def test_create_post(self):
+        """
+        Test creating a new post.
+        """
         url = reverse("create_post")
         data = {
             "title": "New Post",
             "content": "New content",
         }
         response = self.client.post(url, data, format="json")
+        
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["message"] == "Post created successfully"
 
     def test_create_post_no_content(self):
+        """
+        Test creating a post with no content.
+        """
         url = reverse("create_post")
         data = {
             "title": "New Post",
             "content": "",
         }
         response = self.client.post(url, data, format="json")
+        
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_retrieve_post(self):
+        """
+        Test retrieving a single post.
+        """
         url = reverse("retrieve", kwargs={"pk": self.post.pk})
         response = self.client.get(url)
+        
         assert response.status_code == status.HTTP_200_OK
         assert response.data["data"]["title"] == self.post.title
 
     def test_retrieve_post_not_exist(self):
+        """
+        Test retrieving a non-existent post.
+        """
         url = reverse("retrieve", kwargs={"pk": 999})
         response = self.client.get(url)
+        
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.data["message"] == "Something went wrong"
         assert "errors" in response.data
 
     def test_update_post(self):
+        """
+        Test updating an existing post.
+        """
         url = reverse("update_post", kwargs={"pk": self.post.pk})
         data = {
             "title": "Updated Post",
             "content": "Updated content",
         }
         response = self.client.put(url, data, format="json")
+        
         assert response.status_code == status.HTTP_200_OK
         assert response.data["message"] == "Post updated successfully"
 
     def test_update_post_not_exist(self):
+        """
+        Test updating a non-existent post.
+        """
         url = reverse("update_post", kwargs={"pk": 999})
         data = {
             "title": "Updated Post",
             "content": "Updated content",
         }
         response = self.client.put(url, data, format="json")
+        
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.data["message"] == "Something went wrong"
         assert "errors" in response.data
 
     def test_delete_post(self):
+        """
+        Test deleting an existing post.
+        """
         url = reverse("delete_post", kwargs={"pk": self.post.pk})
         response = self.client.delete(url)
+        
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_delete_post_not_exist(self):
+        """
+        Test deleting a non-existent post.
+        """
         url = reverse("delete_post", kwargs={"pk": 999})
         response = self.client.delete(url)
+        
         assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.data["message"] == "Something went wrong"
+        assert "errors" in response.data
+        
+    def test_update_post_invalid_data(self):
+        """
+        Test updating a post with invalid data to trigger the else statement.
+        """
+        url = reverse("update_post", kwargs={"pk": self.post.pk})
+        data = {
+            "title": "",  
+            "content": "Updated content",
+        }
+        response = self.client.put(url, data, format="json")
+        
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["message"] == "Something went wrong"
         assert "errors" in response.data

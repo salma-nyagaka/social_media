@@ -147,14 +147,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-# Additional settings for JWT tokens
-# SIMPLE_JWT = {
-#     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
-#     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
-#     "SLIDING_TOKEN_LIFETIME": timedelta(days=30),
-#     "SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER": timedelta(days=1),
-#     "SLIDING_TOKEN_LIFETIME_LATE_USER": timedelta(days=30),
-# }
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
@@ -181,22 +173,6 @@ EMAIL_HOST_USER = "salmanyagaka@gmail.com"
 EMAIL_HOST_PASSWORD = "oycj urnx ceiw rexn"
 DEFAULT_FROM_EMAIL = "salmanyagaka@gmail.com"
 
-
-# KAFKA_SERVER = '127.0.0.1:9092'
-# ASGI_APPLICATION = 'social_media_project.asgi.application'
-
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-#         'CONFIG': {
-#             'hosts': [('127.0.0.1', 6379)],
-#         },
-#     }
-#
-#
-#
-# ,
-# }
 
 # settings.py
 CELERY_BROKER_URL = "amqp://localhost"

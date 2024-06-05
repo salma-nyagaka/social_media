@@ -8,8 +8,6 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=30, blank=False, null=False)
     last_name = models.CharField(max_length=150, blank=False, null=False)
 
-    def __str__(self):
-        return self.username
 
 
 class UserFollowing(models.Model):
@@ -20,6 +18,3 @@ class UserFollowing(models.Model):
         User, related_name="followers", on_delete=models.CASCADE
     )
     created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.user_id.username} follows {self.following_user_id.username}"
