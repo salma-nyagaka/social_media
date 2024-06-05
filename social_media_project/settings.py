@@ -27,10 +27,10 @@ SECRET_KEY = "django-insecure-xi@@*gceecx#9^^311qpn6#l-e=ydu!5#9uxjrna5=7fw*ch^^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ROOT_URLCONF = 'social_media_project.urls'
+ROOT_URLCONF = "social_media_project.urls"
 
 
-ALLOWED_HOSTS = ['52.90.160.169', '127.0.0.1']
+ALLOWED_HOSTS = ["52.90.160.169", "127.0.0.1"]
 
 
 # Application definition
@@ -207,4 +207,4 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
 
 
-DOMAIN_NAME=os.getenv('DOMAIN_NAME', '')
+DOMAIN_NAME = os.getenv("DOMAIN_NAME", "")

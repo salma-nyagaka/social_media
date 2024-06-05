@@ -42,43 +42,43 @@ class UserLoginAPIViewSerializer(serializers.Serializer):
     def validate(self, data):
         username = data.get("username")
         password = data.get("password")
-        
-        
+
         if not username:
-            raise serializers.ValidationError({
-                "message": "Something went wrong",
-                "errors": {
-                    "username": ["Username is required"]
+            raise serializers.ValidationError(
+                {
+                    "message": "Something went wrong",
+                    "errors": {"username": ["Username is required"]},
                 }
-            })
+            )
         if not password:
-            raise serializers.ValidationError({
-                "message": "Something went wrong",
-                "errors": {
-                    "password": ["Password is required"]
+            raise serializers.ValidationError(
+                {
+                    "message": "Something went wrong",
+                    "errors": {"password": ["Password is required"]},
                 }
-            })
+            )
 
         user = authenticate(
             request=self.context.get("request"), username=username, password=password
         )
 
         if not user:
-            raise serializers.ValidationError({
-                "message": "Something went wrong",
-                "errors": {
-                    "username": ["Invalid credentials or user account is disabled"]
+            raise serializers.ValidationError(
+                {
+                    "message": "Something went wrong",
+                    "errors": {
+                        "username": ["Invalid credentials or user account is disabled"]
+                    },
                 }
-            })
-            
-        if not user.is_active:
-            raise serializers.ValidationError({
-                "message": "Something went wrong",
-                "errors": {
-                    "username": ["User account is disabled"]
-                }
-            })
+            )
 
+        if not user.is_active:
+            raise serializers.ValidationError(
+                {
+                    "message": "Something went wrong",
+                    "errors": {"username": ["User account is disabled"]},
+                }
+            )
 
         refresh = RefreshToken.for_user(user)
         context = {
@@ -91,4 +91,3 @@ class UserLoginAPIViewSerializer(serializers.Serializer):
         }
 
         return context
-       

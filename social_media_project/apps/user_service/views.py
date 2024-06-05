@@ -1,7 +1,7 @@
 import jwt
 from rest_framework import viewsets, status, serializers
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import User
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from datetime import datetime
 from django.utils.timezone import make_aware
@@ -49,8 +49,7 @@ class UserViewSet(viewsets.ViewSet):
             return Response(context, status=status.HTTP_201_CREATED)
         context = {"message": "Something went wrong", "errors": serializer.errors}
         return Response(context, status=status.HTTP_400_BAD_REQUEST)
-    
-    
+
     def list(self, request):
         queryset = User.objects.all()
         serializer = UserSerializer(queryset, many=True)
@@ -59,7 +58,6 @@ class UserViewSet(viewsets.ViewSet):
             "data": serializer.data,
         }
         return Response(context, status=status.HTTP_200_OK)
-
 
     def retrieve(self, request, pk=None):
         try:
@@ -77,42 +75,26 @@ class UserViewSet(viewsets.ViewSet):
         }
         return Response(context, status=status.HTTP_200_OK)
 
-    # def update(self, request, pk=None):
-    #     try:
-    #         user = User.objects.get(pk=pk)
-    #     except User.DoesNotExist:
-    #         return Response(status=status.HTTP_404_NOT_FOUND)
-    #     serializer = UserUpdateSerializer(user, data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         serializer = UserSerializer(user)
-    #         context = {
-    #             "message": "You have successfully updated user data",
-    #             "data": serializer.data,
-    #         }
-    #         return Response(context, status=status.HTTP_200_OK)
-    #     context = {"message": "Something went wrong", "error": serializer.errors}
-    #     return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
     def update_user(self, request, pk=None):
         try:
             user = User.objects.get(pk=pk)
+            serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                context = {
+                    "message": "You have successfully updated user data",
+                    "data": serializer.data,
+                }
+                return Response(context, status=status.HTTP_200_OK)
+            context = {"message": "Something went wrong", "error": serializer.errors}
+            return Response(context, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             context = {
                 "message": "Something went wrong",
                 "error": "User does not exist",
             }
             return Response(context, status=status.HTTP_404_NOT_FOUND)
-        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            context = {
-                "message": "You have successfully updated user data",
-                "data": serializer.data,
-            }
-            return Response(context, status=status.HTTP_200_OK)
-        context = {"message": "Something went wrong", "error": serializer.errors}
-        return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
         try:
@@ -129,7 +111,11 @@ class UserViewSet(viewsets.ViewSet):
 
     def get_current_user(self, request):
         serializer = UserSerializer(request.user)
-        return Response(serializer.data)
+        context = {
+            "message": "You have successfully fetched user data",
+            "data": serializer.data,
+        }
+        return Response(context, status=status.HTTP_200_OK)
 
 
 class UserLoginAPIView(APIView):
@@ -149,46 +135,46 @@ class UserLoginAPIView(APIView):
                 # If it's a list, it means there's a top-level error message
                 error_response = {
                     "message": "Something went wrong",
-                    "errors": {"non_field_errors": error_detail}
+                    "errors": {"non_field_errors": error_detail},
                 }
             else:
                 error_response = {
                     "message": error_detail.get("message", "Something went wrong"),
-                    "errors": error_detail.get("errors", {})
+                    "errors": error_detail.get("errors", {}),
                 }
             return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
 
+class ActivateAccountAPIView(APIView):
+    permission_classes = []  # Allow any
 
-@api_view(["GET"])
-def activate_account(request, token):
-    try:
-        decoded_token = jwt.decode(token, options={"verify_signature": False})
-        user = User.objects.get(pk=decoded_token["user_id"])
-    except (jwt.exceptions.DecodeError, User.DoesNotExist):
-        user = None
+    def get(self, request, token, *args, **kwargs):
+        try:
+            decoded_token = jwt.decode(token, options={"verify_signature": False})
+            user = User.objects.get(pk=decoded_token["user_id"])
+        except (jwt.exceptions.DecodeError, User.DoesNotExist):
+            user = None
 
-    if user is not None:
-        exp = datetime.fromtimestamp(decoded_token["exp"])
-        exp_aware = make_aware(exp)
+        if user is not None:
+            exp = datetime.fromtimestamp(decoded_token["exp"])
+            exp_aware = make_aware(exp)
 
-        if timezone.now() <= exp_aware:
-            user.is_active = True
-            user.save()
-            activation_status = {
-                "message": "Your account has been activated successfully.",
-                "status": status.HTTP_200_OK,
-            }
+            if timezone.now() <= exp_aware:
+                user.is_active = True
+                user.save()
+                activation_status = {
+                    "message": "Your account has been activated successfully.",
+                    "status": status.HTTP_200_OK,
+                }
+            else:
+                activation_status = {
+                    "message": "Activation link has expired.",
+                    "status": status.HTTP_400_BAD_REQUEST,
+                }
         else:
             activation_status = {
-                "message": "Activation link has expired.",
-                "status": status.HTTP_400_BAD_REQUEST,
+                "message": "User does not exist",
+                "status": status.HTTP_404_NOT_FOUND,
             }
-    else:
-        activation_status = {
-            "message": "User does not exist",
-            "status": status.HTTP_404_NOT_FOUND,
-        }
 
-    context = {"activation_status": activation_status}
-
-    return render(request, "activation_status.html", context)
+        context = {"activation_status": activation_status}
+        return render(request, "activation_status.html", context)
