@@ -1,14 +1,14 @@
 #!/bin/bash
 echo "Before install script running..."
 # Remove existing files if they exist
-if [ -f /var/www/twiga/social_media/social_media_project/Dockerfile ]; then
-    sudo rm /var/www/twiga/social_media/social_media_project/Dockerfile
+if [ -f /opt/twiga/social_media/social_media_project/Dockerfile ]; then
+    sudo rm/opt/twiga/social_media/social_media_project/Dockerfile
 fi
 
 
 # Ensure sudo is available and stop any service running on port 80
 if command -v sudo >/dev/null 2>&1; then
-    echo "Stopping any process on port 80"
+    echo "Stopping any process on port 8080"
     sudo fuser -k 80/tcp || true
 else
     echo "sudo command not found"
