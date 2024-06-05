@@ -21,7 +21,7 @@ docker stop $(docker ps -q) || true
 docker rm $(docker ps -a -q) || true
 
 # Navigate to the project directory
-cd /var/www/twiga/social_media/social_media_project || exit
+sudo cd /var/www/twiga/social_media/social_media_project || exit
 
 # Ensure git is installed
 if command -v git >/dev/null 2>&1; then
