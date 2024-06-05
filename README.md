@@ -274,7 +274,7 @@ pytest
 
 | Method | Endpoint                      | Description                             |
 |--------|-------------------------------|-----------------------------------------|
-| POST   | /users/                       | Create a new user.                      |
+| POST   | {{base_url}}/users/create_user/                      | Create a new user.                      |
 | GET    | /users/                       | List all users.                         |
 | GET    | /users/<id>/                  | Retrieve a specific user.               |
 | PATCH  | /users/<id>/                  | Update a specific user.                 |
