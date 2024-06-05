@@ -272,20 +272,23 @@ pytest
 
 ### User Service
 
-| Method | Endpoint                      | Description                             |
-|--------|-------------------------------|-----------------------------------------|
-| POST   | {{base_url}}/users/create_user/                      | Create a new user.                      |
-| GET    | /users/                       | List all users.                         |
-| GET    | /users/<id>/                  | Retrieve a specific user.               |
-| PATCH  | /users/<id>/                  | Update a specific user.                 |
-| DELETE | /users/<id>/                  | Delete a specific user.                 |
-| POST   | /users/login/                 | User login.                             |
-| POST   | /users/follow/<id>/           | Follow a user.                          |
-| POST   | /users/unfollow/<id>/         | Unfollow a user.                        |
-| GET    | /users/followers/<id>/        | List followers of a user.               |
-| GET    | /users/my_profile/            | Get the current authenticated user.     |
-| GET    | /email_confirmation/<token>/  | Activate user account.                  |
-| GET    | /token/refresh/               | Refresh JWT token.                      |
+Certainly! Here is the properly formatted table with the given endpoints and descriptions.
+
+### User Service API Endpoints
+
+| Method | Endpoint                          | Description                             |
+|--------|-----------------------------------|-----------------------------------------|
+| POST   | `{{base_url}}/users/create_user/` | Create a new user.                      |
+| POST   | `{{base_url}}/users/login/`       | User login.                             |
+| GET    | `{{base_url}}/users/get_current_user/` | Get the current authenticated user.     |
+| PATCH  | `{{base_url}}/users/update/<id>/` | Update a specific user.                 |
+| GET    | `{{base_url}}/users/all`          | List all active users.                  |
+| GET    | `{{base_url}}/users/<id>/`        | Retrieve a specific user.               |
+| DELETE | `{{base_url}}/users/delete/<id>/` | Delete a specific user.                 |
+| POST   | `{{base_url}}/users/follow/<id>/` | Follow a user.                          |
+| POST   | `{{base_url}}/users/unfollow/<id>/` | Unfollow a user.                        |
+| GET    | `{{base_url}}/users/followers/<id>/` | List followers of a user.               |
+
 
 ### Post Service
 
