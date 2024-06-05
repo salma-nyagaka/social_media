@@ -4,14 +4,14 @@ from rest_framework.routers import DefaultRouter
 from .views import BlogPostViewSet, CommentViewSet
 
 
-# Define individual views for each action on BlogPostViewSet
+# Individual views for each action on BlogPostViewSet
 create_post = BlogPostViewSet.as_view({"post": "create"})
 retrieve = BlogPostViewSet.as_view({"get": "retrieve"})
 retrieve_all = BlogPostViewSet.as_view({"get": "list"})
 delete_post = BlogPostViewSet.as_view({"delete": "destroy"})
 update_post = BlogPostViewSet.as_view({"put": "update"})
 
-# Define individual views for each action on BlogPostViewSet CommentViewSet
+# Individual views for each action on BlogPostViewSet CommentViewSet
 list_comments = CommentViewSet.as_view({"get": "list"})
 create_comment = CommentViewSet.as_view({"post": "create"})
 retrieve_comment = CommentViewSet.as_view({"get": "retrieve"})

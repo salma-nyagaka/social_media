@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-xi@@*gceecx#9^^311qpn6#l-e=ydu!5#9uxjrna5=7fw*ch^^"
+SECRET_KEY = os.getenv('SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -86,11 +86,11 @@ WSGI_APPLICATION = "social_media_project.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "social_media_project",
-        "USER": "salmanyagaka",
-        "PASSWORD": "password",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "NAME": os.getenv('DATABASE_NAME', ''),
+        "USER": os.getenv('DATABASE_USER', ''),
+        "PASSWORD": os.getenv('DATABASE_PASSWORD', ''),
+        "HOST": os.getenv('DATABASE_HOST', ''),
+        "PORT": os.getenv('DATABASE_PORT', ''),
     }
 }
 
@@ -165,13 +165,15 @@ SIMPLE_JWT = {
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
     "TOKEN_TYPE_CLAIM": "token_type",
 }
+
+
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "salmanyagaka@gmail.com"
-EMAIL_HOST_PASSWORD = "oycj urnx ceiw rexn"
-DEFAULT_FROM_EMAIL = "salmanyagaka@gmail.com"
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', '')
 
 
 # settings.py
