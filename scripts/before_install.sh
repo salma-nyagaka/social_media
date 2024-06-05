@@ -24,6 +24,3 @@ docker rm $(docker ps -a -q) || true
 if [ -d /var/www/twiga/social_media/social_media_project ]; then
     cd /var/www/twiga/social_media/social_media_project
     sudo git pull
-else
-    sudo git clone git@github.com:salma-nyagaka/social_media.git /var/www/twiga/social_media/social_media_project
-fi
