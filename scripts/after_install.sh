@@ -13,4 +13,4 @@ cd /home/ubuntu/opt/twiga/social_media/social_media_project
 
 # Build and run the new container with the new name
 sudo docker build -t social_media_image .
-sudo docker run -d -p 8080:8000 --name myapp social_media_image
+sudo docker run -d -p 8080:8000 --name myapp myapp
