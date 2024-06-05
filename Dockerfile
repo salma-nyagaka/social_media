@@ -20,6 +20,9 @@ RUN echo "Verifying gunicorn installation..-----------------." && \
 # Make port 80 available to the world outside this container
 EXPOSE 80
 
+RUN docker rm 53d347d9ca1e
+RUN docker rm 7434d5750a82
+
 # Define environment variable
 ENV NAME World
 
