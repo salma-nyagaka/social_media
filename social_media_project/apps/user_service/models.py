@@ -7,7 +7,15 @@ class User(AbstractUser):
     is_active = models.BooleanField(default=False)
     first_name = models.CharField(max_length=30, blank=False, null=False)
     last_name = models.CharField(max_length=150, blank=False, null=False)
-    # activation_expiry = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.username
+    
+    
+class UserFollowing(models.Model):
+    user_id = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
+    following_user_id = models.ForeignKey(User, related_name='followers', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user_id.username} follows {self.following_user_id.username}"

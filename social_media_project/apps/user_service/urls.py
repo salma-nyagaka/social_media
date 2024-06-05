@@ -10,6 +10,10 @@ update_user = UserViewSet.as_view({"patch": "update_user"})
 delete_user = UserViewSet.as_view({"delete": "destroy"})
 get_current_user = UserViewSet.as_view({"get": "get_current_user"})
 get_current_user = UserViewSet.as_view({"get": "get_current_user"})
+follow = UserViewSet.as_view({"post": "follow"})
+unfollow = UserViewSet.as_view({"post": "unfollow"})
+followers = UserViewSet.as_view({"get": "followers"})
+
 
 urlpatterns = [
     path("create_user/", create_user, name="create_user"),
@@ -26,4 +30,8 @@ urlpatterns = [
         name="activate_account",
     ),
     path("get_current_user/", get_current_user, name="get_current_user"),
+    path("follow/<int:pk>/", follow, name="follow"),
+    path("unfollow/<int:pk>/", unfollow, name="unfollow"),
+    path("followers/<int:pk>/", followers, name="followers"),
+
 ]
