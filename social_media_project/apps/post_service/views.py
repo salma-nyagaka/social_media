@@ -102,7 +102,7 @@ class BlogPostViewSet(viewsets.ViewSet):
                     recipient_list=[],
                     html_template="new_post.html",
                     context={
-                        "post_url": "{}/blogs/posts/{}/".format(
+                        "post_url": "{}/blogs/{}/".format(
                             settings.DOMAIN_NAME, post_id
                         )
                     },
