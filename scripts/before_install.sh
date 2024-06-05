@@ -5,10 +5,6 @@ if [ -f /var/www/twiga/social_media/social_media_project/Dockerfile ]; then
     sudo rm /var/www/twiga/social_media/social_media_project/Dockerfile
 fi
 
-# Remove existing files if they exist
-if [ -d /var/www/twiga/social_media/social_media_project ]; then
-    sudo rm -rf /var/www/twiga/social_media/social_media_project
-fi
 
 # Ensure sudo is available and stop any service running on port 80
 if command -v sudo >/dev/null 2>&1; then
@@ -23,3 +19,12 @@ fi
 # Add any additional cleanup commands here
 docker stop $(docker ps -q) || true
 docker rm $(docker ps -a -q) || true
+
+
+# Fetch the latest code from the Git repository
+if [ -d /var/www/twiga/social_media/social_media_project ]; then
+    cd /var/www/twiga/social_media/social_media_project
+    sudo git pull
+else
+    sudo git clone https://github.com/salma-nyagaka/social_media.git /var/www/twiga/social_media/social_media_project
+fi
