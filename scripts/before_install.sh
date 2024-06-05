@@ -21,6 +21,7 @@ docker stop $(docker ps -q) || true
 docker rm $(docker ps -a -q) || true
 
 # Fetch the latest code from the Git repository
+# Fetch the latest code from the Git repository if the directory exists
 if [ -d /var/www/twiga/social_media/social_media_project ]; then
     cd /var/www/twiga/social_media/social_media_project
     sudo git pull
