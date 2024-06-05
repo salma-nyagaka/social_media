@@ -27,10 +27,10 @@ SECRET_KEY = "django-insecure-xi@@*gceecx#9^^311qpn6#l-e=ydu!5#9uxjrna5=7fw*ch^^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ROOT_URLCONF = 'social_media_project.urls'
+ROOT_URLCONF = "social_media_project.urls"
 
 
-ALLOWED_HOSTS = ['52.90.160.169', '127.0.0.1:8000']
+ALLOWED_HOSTS = ["52.90.160.169", "127.0.0.1"]
 
 
 # Application definition
@@ -83,16 +83,16 @@ WSGI_APPLICATION = "social_media_project.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "social_media_project",
-#         "USER": "salmanyagaka",
-#         "PASSWORD": "password",
-#         "HOST": "localhost",
-#         "PORT": "5433",
-#     }
-# }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "social_media_project",
+        "USER": "salmanyagaka",
+        "PASSWORD": "password",
+        "HOST": "localhost",
+        "PORT": "5432",
+    }
+}
 
 
 REST_FRAMEWORK = {
@@ -205,3 +205,6 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
+
+
+DOMAIN_NAME = os.getenv("DOMAIN_NAME", "")

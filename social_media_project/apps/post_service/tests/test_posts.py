@@ -1,82 +1,94 @@
-# post_service/tests/test_views.py
-"""
-Test cases for BlogPost and Comment APIs.
-"""
-
 import pytest
 from django.urls import reverse
-from django.test import TestCase
-from unittest.mock import patch
-from rest_framework.test import APIClient
-from social_media_project.apps.post_service.models import Post, Comment
-from social_media_project.apps.user_service.models import User
-
+from rest_framework.test import APIClient, APIRequestFactory
+from rest_framework import status
+from social_media_project.apps.post_service.models import User, Post, Comment
 
 @pytest.mark.django_db
-class TestPostAPI(TestCase):
-    """
-    Test suite for the BlogPost and Comment APIs.
-    """
-
-    def setUp(self):
-        """
-        Set up test environment.
-        Creates a test user and authenticates the API client.
-        Also creates a test post.
-        """
-        self.user = User.objects.create_user(
-            username="testuser", password="testpassword", email="test@example.com"
-        )
+class TestBlogPostAPI:
+    def setup_method(self):
         self.client = APIClient()
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass',
+            email='testuser@example.com',
+            is_active=True
+        )
         self.client.force_authenticate(user=self.user)
-        self.post = Post.objects.create(
-            title="Test Post", content="This is a test post", user=self.user
-        )
+        self.factory = APIRequestFactory()
+        self.post = Post.objects.create(title='Test Post', content='Test content', user=self.user)
+        self.comment = Comment.objects.create(post=self.post, content='Test comment', user=self.user)
 
-    @patch("social_media_project.apps.notification_service.tasks.send_email_task.delay")
-    def test_create_post(self, mock_send_email_task):
-        """
-        Test creating a new blog post.
-        Verifies that the post is created and an email notification is sent.
-        """
-        url = reverse(
-            "post-list"
-        )  # Update this to the correct name for your post list view
-        data = {"title": "New Post", "content": "This is a new post"}
-        response = self.client.post(url, data, format="json")
+    def test_list_posts(self):
+        url = reverse('retrieve_all')
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert 'data' in response.data
+        assert response.data['message'] == "Post retrieved successfully"
 
-        assert response.status_code == 201
-        assert Post.objects.count() == 2
-        post = Post.objects.last()
-        assert post.title == "New Post"
+    def test_create_post(self):
+        url = reverse('create_post')
+        data = {
+            'title': 'New Post',
+            'content': 'New content',
+        }
+        response = self.client.post(url, data, format='json')
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data['message'] == "Post created successfully"
 
-        # Check if the email task was called
-        mock_send_email_task.assert_called_once()
-        call_args = mock_send_email_task.call_args[1]
-        assert call_args["subject"] == "New Post Created"
-        assert 'A new post titled "New Post" has been created.' in call_args["message"]
 
-    @patch("social_media_project.apps.notification_service.tasks.send_email_task.delay")
-    def test_create_comment(self, mock_send_email_task):
-        """
-        Test creating a new comment on a post.
-        Verifies that the comment is created and an email notification is sent.
-        """
-        url = reverse(
-            "comment-list"
-        )  # Update this to the correct name for your comment list view
-        data = {"post": self.post.id, "content": "This is a comment"}
-        response = self.client.post(url, data, format="json")
 
-        assert response.status_code == 201
-        assert Comment.objects.count() == 1
-        comment = Comment.objects.first()
-        assert comment.content == "This is a comment"
+    def test_create_post_no_content(self):
+        url = reverse('create_post')
+        data = {
+            'title': 'New Post',
+            'content': '',
+        }
+        response = self.client.post(url, data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-        # Check if the email task was called
-        mock_send_email_task.assert_called_once()
-        call_args = mock_send_email_task.call_args[1]
-        assert (
-            call_args["subject"] == "New comment has been added to the post: Test Post"
-        )
-        assert "This is a comment" in call_args["message"]
+    def test_retrieve_post(self):
+        url = reverse('retrieve', kwargs={'pk': self.post.pk})
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['data']['title'] == self.post.title
+
+    def test_retrieve_post_not_exist(self):
+        url = reverse('retrieve', kwargs={'pk': 999})
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.data['message'] == "Something went wrong"
+        assert "errors" in response.data
+
+    def test_update_post(self):
+        url = reverse('update_post', kwargs={'pk': self.post.pk})
+        data = {
+            'title': 'Updated Post',
+            'content': 'Updated content',
+        }
+        response = self.client.put(url, data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['message'] == "Post updated successfully"
+
+    def test_update_post_not_exist(self):
+        url = reverse('update_post', kwargs={'pk': 999})
+        data = {
+            'title': 'Updated Post',
+            'content': 'Updated content',
+        }
+        response = self.client.put(url, data, format='json')
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.data['message'] == "Something went wrong"
+        assert "errors" in response.data
+
+    def test_delete_post(self):
+        url = reverse('delete_post', kwargs={'pk': self.post.pk})
+        response = self.client.delete(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    def test_delete_post_not_exist(self):
+        url = reverse('delete_post', kwargs={'pk': 999})
+        response = self.client.delete(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.data['message'] == "Something went wrong"
+        assert "errors" in response.data

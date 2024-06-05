@@ -45,11 +45,17 @@ class UserLoginAPIViewSerializer(serializers.Serializer):
 
         if not username:
             raise serializers.ValidationError(
-                {"message": "Something went wrong", "errors": ["Username is required"]}
+                {
+                    "message": "Something went wrong",
+                    "errors": {"username": ["Username is required"]},
+                }
             )
         if not password:
             raise serializers.ValidationError(
-                {"message": "Something went wrong", "errors": ["Password is required"]}
+                {
+                    "message": "Something went wrong",
+                    "errors": {"password": ["Password is required"]},
+                }
             )
 
         user = authenticate(
@@ -58,13 +64,19 @@ class UserLoginAPIViewSerializer(serializers.Serializer):
 
         if not user:
             raise serializers.ValidationError(
-                {"message": "Something went wrong", "errors": ["Invalid credentials"]}
+                {
+                    "message": "Something went wrong",
+                    "errors": {
+                        "username": ["Invalid credentials or user account is disabled"]
+                    },
+                }
             )
+
         if not user.is_active:
             raise serializers.ValidationError(
                 {
                     "message": "Something went wrong",
-                    "errors": ["User account is disabled"],
+                    "errors": {"username": ["User account is disabled"]},
                 }
             )
 
@@ -78,4 +90,4 @@ class UserLoginAPIViewSerializer(serializers.Serializer):
             },
         }
 
-        return
+        return context
