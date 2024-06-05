@@ -1,8 +1,8 @@
 #!/bin/bash
 echo "Before install script running..."
 # Remove existing files if they exist
-if [ -f /opt/twiga/social_media/social_media_project/Dockerfile ]; then
-    sudo rm/opt/twiga/social_media/social_media_project/Dockerfile
+if [ -f /home/ubuntu/opt/twiga/social_media/social_media_project/Dockerfile ]; then
+    sudo rm/home/ubuntu/opt/twiga/social_media/social_media_project/Dockerfile
 fi
 
 
