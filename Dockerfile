@@ -36,11 +36,19 @@ FROM python:3.12-slim
 # Set the working directory in the container
 WORKDIR /app
 
+# Install system dependencies and build tools
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy the current directory contents into the container at /app
 COPY . /app
 
 # Install any needed packages specified in requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip setuptools wheel
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Ensure gunicorn is installed
 RUN pip install gunicorn
