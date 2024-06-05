@@ -20,9 +20,13 @@ fi
 docker stop $(docker ps -q) || true
 docker rm $(docker ps -a -q) || true
 
-# Fetch the latest code from the Git repository
-# Fetch the latest code from the Git repository if the directory exists
-# if [ -d /var/www/twiga/social_media/social_media_project ]; then
-#     cd /var/www/twiga/social_media/social_media_project
-#     sudo git pull
-# fi
+# Ensure git is installed
+if command -v git >/dev/null 2>&1; then
+    echo "Updating repository..."
+    git pull origin develop || { echo "git pull failed"; exit 1; }
+else
+    echo "git command not found"
+    exit 1
+fi
+
+echo "Before install script completed."
