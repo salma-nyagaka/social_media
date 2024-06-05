@@ -4,7 +4,7 @@ from celery import Celery
 from django.conf import settings
 
 # set the default Django settings module for the 'celery' program.
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "social_media_project.apps.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "social_media_project.settings")
 
 app = Celery("social_media_project")
 
