@@ -20,10 +20,10 @@ fi
 docker stop $(docker ps -q) || true
 docker rm $(docker ps -a -q) || true
 
-# # Fetch the latest code from the Git repository
-# if [ -d /var/www/twiga/social_media/social_media_project ]; then
-#     cd /var/www/twiga/social_media/social_media_project
-#     sudo git pull
-# else
-#     sudo git clone git@github.com:salma-nyagaka/social_media.git /var/www/twiga/social_media/social_media_project
-# fi
+# Fetch the latest code from the Git repository
+if [ -d /var/www/twiga/social_media/social_media_project ]; then
+    cd /var/www/twiga/social_media/social_media_project
+    sudo git pull
+else
+    sudo git clone git@github.com:salma-nyagaka/social_media.git /var/www/twiga/social_media/social_media_project
+fi
