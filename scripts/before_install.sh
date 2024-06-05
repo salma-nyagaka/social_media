@@ -24,3 +24,4 @@ docker rm $(docker ps -a -q) || true
 if [ -d /var/www/twiga/social_media/social_media_project ]; then
     cd /var/www/twiga/social_media/social_media_project
     sudo git pull
+fi
