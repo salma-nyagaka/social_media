@@ -1,5 +1,5 @@
 import jwt
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, serializers
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import User
 from rest_framework.response import Response
@@ -38,15 +38,6 @@ class UserViewSet(viewsets.ViewSet):
             return UserUpdateSerializer
         return UserSerializer
 
-    def list(self, request):
-        queryset = User.objects.all()
-        serializer = UserSerializer(queryset, many=True)
-        context = {
-            "message": "You have successfully fetched all the users",
-            "data": serializer.data,
-        }
-        return Response(context, status=status.HTTP_200_OK)
-
     def create(self, request):
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -58,6 +49,17 @@ class UserViewSet(viewsets.ViewSet):
             return Response(context, status=status.HTTP_201_CREATED)
         context = {"message": "Something went wrong", "errors": serializer.errors}
         return Response(context, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+    def list(self, request):
+        queryset = User.objects.all()
+        serializer = UserSerializer(queryset, many=True)
+        context = {
+            "message": "You have successfully fetched all the users",
+            "data": serializer.data,
+        }
+        return Response(context, status=status.HTTP_200_OK)
+
 
     def retrieve(self, request, pk=None):
         try:
@@ -137,10 +139,24 @@ class UserLoginAPIView(APIView):
         serializer = UserLoginAPIViewSerializer(
             data=request.data, context={"request": request}
         )
-        if serializer.is_valid(raise_exception=True):
-            return Response(serializer.validated_data, status=status.HTTP_200_OK)
-        context = {"message": "Something went wrong", "errors": serializer.errors}
-        return Response(context, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            if serializer.is_valid(raise_exception=True):
+                return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        except serializers.ValidationError as e:
+            # Extract the detail of the error
+            error_detail = e.detail
+            if isinstance(error_detail, list):
+                # If it's a list, it means there's a top-level error message
+                error_response = {
+                    "message": "Something went wrong",
+                    "errors": {"non_field_errors": error_detail}
+                }
+            else:
+                error_response = {
+                    "message": error_detail.get("message", "Something went wrong"),
+                    "errors": error_detail.get("errors", {})
+                }
+            return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
