@@ -50,12 +50,13 @@ RUN echo "Verifying gunicorn installation..." && gunicorn --version
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
 
-RUN docker rm 53d347d9ca1e
-RUN docker rm 7434d5750a82
+# RUN docker rm 53d347d9ca1e
+# RUN docker rm 7434d5750a82
 
 
 # Define environment variable
 ENV NAME World
+ENV DJANGO_SETTINGS_MODULE social_media_project.settings
 
 # Run gunicorn when the container launches
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "social_media_project.wsgi:application"]
