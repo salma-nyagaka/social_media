@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import jwt
 
 from .models import User
-from ..notification_service.tasks import  send_email_task, send_batch_notifications
+from ..notification_service.tasks import send_email_task, send_batch_notifications
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -32,16 +32,18 @@ class UserCreateSerializer(serializers.ModelSerializer):
         token = jwt.encode(
             {"user_id": user.id, "exp": exp}, settings.SECRET_KEY, algorithm="HS256"
         )
-        
+
         domain = settings.DOMAIN_NAME
         send_batch_notifications.delay(
-                  subject="New account created",
-                    message='',
-                    recipient_list=[user.email],
-                    context={"context": "{}/users/email_confirmation/{}".format(domain, str(token))},
-
-                   html_template="activation_email.html",
-         )
+            subject="New account created",
+            message="",
+            recipient_list=[user.email],
+            context={
+                "context": "{}/users/email_confirmation/{}".format(domain, str(token))
+            },
+            html_template="activation_email.html",
+            notification_type="registration",
+        )
 
         return user
 

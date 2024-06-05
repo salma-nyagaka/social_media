@@ -7,15 +7,13 @@ class Notification(models.Model):
     NOTIFICATION_TYPES = (
         ("post", "Post"),
         ("comment", "Comment"),
-        ("message", "Message"),
+        ("registration", "Registration"),
         ("follow", "Follow"),
         ("unfollow", "Unfollow"),
     )
 
-    sender = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        related_name="sent_notifications",
-        on_delete=models.CASCADE,
+    sender = models.CharField(
+     max_length=100
     )
     receiver = models.ForeignKey(
         settings.AUTH_USER_MODEL,

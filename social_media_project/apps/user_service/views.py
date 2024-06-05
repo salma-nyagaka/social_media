@@ -75,7 +75,6 @@ class UserViewSet(viewsets.ViewSet):
         }
         return Response(context, status=status.HTTP_200_OK)
 
-
     def update_user(self, request, pk=None):
         try:
             user = User.objects.get(pk=pk)
@@ -143,6 +142,7 @@ class UserLoginAPIView(APIView):
                     "errors": error_detail.get("errors", {}),
                 }
             return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ActivateAccountAPIView(APIView):
     permission_classes = []  # Allow any

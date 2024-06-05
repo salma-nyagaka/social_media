@@ -100,11 +100,10 @@ class BlogPostViewSet(viewsets.ViewSet):
                     message=f'A new post titled "{title}" has been created.',
                     recipient_list=receiver_emails,
                     context={
-                        "post_url": "{}/blogs/{}/".format(
-                            settings.DOMAIN_NAME, post_id
-                        )
+                        "post_url": "{}/blogs/{}/".format(settings.DOMAIN_NAME, post_id)
                     },
-                    html_template="new_post.html"
+                    html_template="new_post.html",
+                    notification_type="post",
                 )
             post = serializer.save(user=self.request.user)
             response_data = {
@@ -211,7 +210,7 @@ class CommentViewSet(viewsets.ViewSet):
                     User.objects.filter(is_active=True).values_list("email", flat=True)
                 )
                 send_batch_notifications.delay(
-                   subject="New comment has been added to the post: {}".format(
+                    subject="New comment has been added to the post: {}".format(
                         post.title
                     ),
                     message=content,
@@ -219,8 +218,10 @@ class CommentViewSet(viewsets.ViewSet):
                     context={
                         "post_url": "{}/blogs/{}/".format(
                             settings.DOMAIN_NAME, comment_id
-                )},
-                    html_template="new_comment.html"
+                        )
+                    },
+                    html_template="new_comment.html",
+                    notification_type="comment",
                 )
             response_data = {
                 "message": "Comment created successfully",
