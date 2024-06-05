@@ -7,7 +7,7 @@ cd /var/www/twiga/social_media/social_media_project
 sudo docker stop myapp || true
 sudo docker rm myapp || true
 
-sudo cp -r /var/www/twiga/social_media/social_media_project /var/www/twiga/social_media/deployed_app
+# sudo cp -r /var/www/twiga/social_media/social_media_project /var/www/twiga/social_media/deployed_app
 
 
 # Build and run the new container

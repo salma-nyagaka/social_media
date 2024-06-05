@@ -5,6 +5,11 @@ if [ -f /var/www/twiga/social_media/social_media_project/Dockerfile ]; then
     sudo rm /var/www/twiga/social_media/social_media_project/Dockerfile
 fi
 
+# Remove existing files if they exist
+if [ -d /var/www/twiga/social_media/social_media_project ]; then
+    sudo rm -rf /var/www/twiga/social_media/social_media_project
+fi
+
 # Ensure sudo is available and stop any service running on port 80
 if command -v sudo >/dev/null 2>&1; then
     echo "Stopping any process on port 80"
