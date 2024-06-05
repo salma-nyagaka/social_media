@@ -1,2 +1,2 @@
 #!/bin/bash
-docker start $(docker ps -a -q)
+sudo docker start myapp
