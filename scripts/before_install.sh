@@ -20,22 +20,5 @@ fi
 docker stop $(docker ps -q) || true
 docker rm $(docker ps -a -q) || true
 
-# Navigate to the project directory
-sudo cd /var/www/twiga/social_media/social_media_project || exit
-
-# Ensure git is installed
-if command -v git >/dev/null 2>&1; then
-    echo "Updating repository..."
-    if [ ! -d .git ]; then
-        git init
-        git remote add origin https://github.com/salma-nyagaka/social_media.git
-        git fetch
-    fi
-    git pull origin main || { echo "git pull failed"; exit 1; }
-else
-    echo "git command not found"
-    exit 1
-fi
-
 
 echo "Before install script completed."
