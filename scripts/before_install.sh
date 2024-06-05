@@ -2,7 +2,7 @@
 echo "Before install script running..."
 # Remove existing files if they exist
 if [ -f /home/ubuntu/opt/twiga/social_media/social_media_project/Dockerfile ]; then
-    sudo rm/home/ubuntu/opt/twiga/social_media/social_media_project/Dockerfile
+    sudo rm /home/ubuntu/opt/twiga/social_media/social_media_project/Dockerfile
 fi
 
 
@@ -19,6 +19,3 @@ fi
 # Add any additional cleanup commands here
 docker stop $(docker ps -q) || true
 docker rm $(docker ps -a -q) || true
-
-
-echo "Before install script completed."
