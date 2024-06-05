@@ -9,8 +9,8 @@ from datetime import datetime, timedelta
 import jwt
 
 from .models import User
-from ..notification_service.tasks import send_email_task, send_batch_notifications
-# ["id", "username", "email", "first_name", "last_name", "is_active",
+from ..notification_service.tasks import send_batch_notifications
+
 
 class UserSerializer(serializers.ModelSerializer):
     followers_count = serializers.SerializerMethodField()
@@ -18,10 +18,20 @@ class UserSerializer(serializers.ModelSerializer):
     followers = serializers.SerializerMethodField()
     following = serializers.SerializerMethodField()
 
-
     class Meta:
         model = User
-        fields = ["id", "username", "email", "first_name", "last_name", "is_active",'followers_count', 'following_count', 'followers', 'following']
+        fields = [
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "is_active",
+            "followers_count",
+            "following_count",
+            "followers",
+            "following",
+        ]
 
     def get_followers_count(self, obj):
         return obj.followers.count()
@@ -31,13 +41,27 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_followers(self, obj):
         followers = obj.followers.all()
-        return [{'user_id': follower.following_user_id.id, 'username': follower.following_user_id.username, "user_follow_id": follower.id} for follower in followers]
+        return [
+            {
+                "user_id": follower.following_user_id.id,
+                "username": follower.following_user_id.username,
+                "user_follow_id": follower.id,
+            }
+            for follower in followers
+        ]
 
     def get_following(self, obj):
         following = obj.following.all()
-        return [{'user_id': followee.following_user_id.id, 'username': followee.following_user_id.username, "user_follow_id": followee.id} for followee in following]
-    
-    
+        return [
+            {
+                "user_id": followee.following_user_id.id,
+                "username": followee.following_user_id.username,
+                "user_follow_id": followee.id,
+            }
+            for followee in following
+        ]
+
+
 class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

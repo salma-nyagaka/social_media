@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from ..notification_service.tasks import send_batch_notifications
 
 from .serializers import (
     UserSerializer,
@@ -52,10 +53,10 @@ class UserViewSet(viewsets.ViewSet):
         return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
     def list(self, request):
-        queryset = User.objects.all()
+        queryset = User.objects.filter(is_active=True)  # Filter for active users
         serializer = UserSerializer(queryset, many=True)
         context = {
-            "message": "You have successfully fetched all the users",
+            "message": "You have successfully fetched all active users",
             "data": serializer.data,
         }
         return Response(context, status=status.HTTP_200_OK)
@@ -117,45 +118,78 @@ class UserViewSet(viewsets.ViewSet):
         }
         return Response(context, status=status.HTTP_200_OK)
 
-
     def follow(self, request, pk=None):
         user_to_follow = get_object_or_404(User, pk=pk)
         user = request.user
         if user == user_to_follow:
-            return Response({'status': 'You cannot follow yourself'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if UserFollowing.objects.filter(user_id=user, following_user_id=user_to_follow).exists():
-            return Response({'status': 'You are already following this user'}, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(
+                {"status": "You cannot follow yourself"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if UserFollowing.objects.filter(
+            user_id=user, following_user_id=user_to_follow
+        ).exists():
+            return Response(
+                {"status": "You are already following this user"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         if user != user_to_follow:
             UserFollowing.objects.create(user_id=user, following_user_id=user_to_follow)
             context = {
-                "message": "You have successfully followed {}".format(user_to_follow.username)
-             
+                "message": "You have successfully followed {}".format(
+                    user_to_follow.username
+                )
             }
+            send_batch_notifications.delay(
+                subject="New follow alert!",
+                message="You have been followed by {}".format(user.email),
+                recipient_list=[user_to_follow.email],
+                context={},
+                html_template="follow.html",
+                notification_type="follow",
+            )
+
             return Response(context, status=status.HTTP_200_OK)
         else:
-            return Response({'status': 'You cannot follow yourself'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"status": "You cannot follow yourself"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
     def unfollow(self, request, pk=None):
         user_to_unfollow = get_object_or_404(User, pk=pk)
         user = request.user
         if user == user_to_unfollow:
-            return Response({'status': 'You cannot unfollow yourself'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if not UserFollowing.objects.filter(user_id=user, following_user_id=user_to_unfollow).exists():
-            return Response({'status': 'You are not following this user'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        
+            return Response(
+                {"status": "You cannot unfollow yourself"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not UserFollowing.objects.filter(
+            user_id=user, following_user_id=user_to_unfollow
+        ).exists():
+            return Response(
+                {"status": "You are not following this user"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         if user != user_to_unfollow:
-            UserFollowing.objects.filter(user_id=user, following_user_id=user_to_unfollow).delete()
+            UserFollowing.objects.filter(
+                user_id=user, following_user_id=user_to_unfollow
+            ).delete()
             context = {
-                "message": "You have successfully unfollowed {}".format(user_to_unfollow.username)
-             
+                "message": "You have successfully unfollowed {}".format(
+                    user_to_unfollow.username
+                )
             }
             return Response(context, status=status.HTTP_200_OK)
         else:
-            return Response({'status': 'You cannot unfollow yourself'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"status": "You cannot unfollow yourself"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
     def followers(self, request, pk=None):
         user = get_object_or_404(User, pk=4)

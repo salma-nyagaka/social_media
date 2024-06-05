@@ -12,9 +12,7 @@ class Notification(models.Model):
         ("unfollow", "Unfollow"),
     )
 
-    sender = models.CharField(
-     max_length=100
-    )
+    sender = models.CharField(max_length=100)
     receiver = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="received_notifications",
@@ -24,6 +22,3 @@ class Notification(models.Model):
     text = models.TextField()
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.sender} sent a {self.notification_type} notification to {self.receiver}"

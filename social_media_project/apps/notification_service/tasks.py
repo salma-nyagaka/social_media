@@ -1,14 +1,15 @@
 from celery import shared_task
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import send_mass_mail, EmailMultiAlternatives, get_connection
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.core.mail import send_mail, send_mass_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
+import html2text
+
+
 from .models import Notification
-
-
 from social_media_project.apps.user_service.models import User
 
 
@@ -71,12 +72,41 @@ def send_batch_notifications(
                 text=message,
             )
 
-            user = User.objects.get(email=email)
             context.update(context)
+            context["message"] = message
+            context["notification"] = notification
             html_content = render_to_string(html_template, context)
-            text_content = strip_tags(html_content)
+            text_content = html2text.html2text(html_content)
+
             email_messages.append(
-                (subject, text_content, settings.DEFAULT_FROM_EMAIL, [email])
+                (
+                    subject,
+                    text_content,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    html_content,
+                )
             )
 
-        send_mass_mail(tuple(email_messages), fail_silently=False)
+        # Send emails in bulk
+        send_bulk_emails(email_messages)
+
+    return f"Notifications sent to {total_users} users in {num_batches} batches."
+
+
+def send_bulk_emails(email_messages):
+    connection = get_connection()
+    emails = []
+    for (
+        subject,
+        text_content,
+        from_email,
+        recipient_list,
+        html_content,
+    ) in email_messages:
+        email = EmailMultiAlternatives(
+            subject, text_content, from_email, recipient_list, connection=connection
+        )
+        email.attach_alternative(html_content, "text/html")
+        emails.append(email)
+    connection.send_messages(emails)
