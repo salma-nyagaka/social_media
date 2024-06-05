@@ -3,10 +3,13 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.db import transaction
-from django.contrib.sites.shortcuts import get_current_site
-from .utils import send_activation_email
+from django.conf import settings
+import datetime
+from datetime import datetime, timedelta
+import jwt
+
 from .models import User
-from ..notification_service.tasks import send_activation_email
+from ..notification_service.tasks import  send_email_task, send_batch_notifications
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -25,7 +28,21 @@ class UserCreateSerializer(serializers.ModelSerializer):
     @transaction.atomic()
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
-        send_activation_email(user)
+        exp = datetime.utcnow() + timedelta(hours=24)
+        token = jwt.encode(
+            {"user_id": user.id, "exp": exp}, settings.SECRET_KEY, algorithm="HS256"
+        )
+        
+        domain = settings.DOMAIN_NAME
+        send_batch_notifications.delay(
+                  subject="New account created",
+                    message='',
+                    recipient_list=[user.email],
+                    context={"context": "{}/users/email_confirmation/{}".format(domain, str(token))},
+
+                   html_template="activation_email.html",
+         )
+
         return user
 
 

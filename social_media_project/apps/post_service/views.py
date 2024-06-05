@@ -7,7 +7,7 @@ from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
 
 # from social_media_project.apps.notification_service.kafka_utils import send_notification_to_kafka
-from ..notification_service.tasks import send_email_task
+from ..notification_service.tasks import send_email_task, send_batch_notifications
 from ..user_service.models import User
 from django.conf import settings
 
@@ -89,24 +89,22 @@ class BlogPostViewSet(viewsets.ViewSet):
         """
         try:
             title = serializer.validated_data.get("title", "No topic")
-            post_id = serializer.validated_data.get("post_id", "No id")
+            post_id = serializer.validated_data.get("id", "No id")
             if title:
                 receiver_emails = list(
                     User.objects.filter(is_active=True).values_list("email", flat=True)
                 )
                 # Send email notification after post is created
-                send_email_task.delay(
+                send_batch_notifications.delay(
                     subject="New Post Created",
                     message=f'A new post titled "{title}" has been created.',
-                    from_email="salmanyagaka@gmail.com",
-                    recipient_list=[],
-                    html_template="new_post.html",
+                    recipient_list=receiver_emails,
                     context={
                         "post_url": "{}/blogs/{}/".format(
                             settings.DOMAIN_NAME, post_id
                         )
                     },
-                    bcc=receiver_emails,
+                    html_template="new_post.html"
                 )
             post = serializer.save(user=self.request.user)
             response_data = {
@@ -212,20 +210,17 @@ class CommentViewSet(viewsets.ViewSet):
                 receiver_emails = list(
                     User.objects.filter(is_active=True).values_list("email", flat=True)
                 )
-                send_email_task.delay(
-                    subject="New comment has been added to the post: {}".format(
+                send_batch_notifications.delay(
+                   subject="New comment has been added to the post: {}".format(
                         post.title
                     ),
                     message=content,
-                    from_email="salmanyagaka@gmail.com",
-                    recipient_list=[],
-                    html_template="new_comment.html",
+                    recipient_list=receiver_emails,
                     context={
-                        "post_url": "{}/blogs/comments/{}/".format(
+                        "post_url": "{}/blogs/{}/".format(
                             settings.DOMAIN_NAME, comment_id
-                        )
-                    },
-                    bcc=receiver_emails,
+                )},
+                    html_template="new_comment.html"
                 )
             response_data = {
                 "message": "Comment created successfully",
