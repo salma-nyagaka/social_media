@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,7 +33,7 @@ DEBUG = True
 ROOT_URLCONF = "social_media_project.urls"
 
 
-ALLOWED_HOSTS = ["52.90.160.169", "127.0.0.1"]
+ALLOWED_HOSTS = ["52.90.160.169", "127.0.0.1", "localhost"]
 
 
 # Application definition
@@ -44,22 +47,25 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
+    'drf_yasg',
+    'corsheaders',
     "social_media_project.apps.user_service",
     "social_media_project.apps.post_service",
     "social_media_project.apps.notification_service",
-    # "django-celery-results",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
     {
@@ -186,3 +192,29 @@ CELERY_TIMEZONE = "UTC"
 
 
 DOMAIN_NAME = os.getenv("DOMAIN_NAME", "")
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+
+# settings.py
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://4f59239970b87c64005a1439e5d93405@o4507386132889600.ingest.us.sentry.io/4507386135314432",
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+)

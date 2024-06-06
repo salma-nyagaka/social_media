@@ -12,6 +12,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from django.core.cache import cache
+from rest_framework.decorators import action
+
 from ..notification_service.tasks import send_batch_notifications
 
 from .serializers import (
@@ -44,6 +47,7 @@ class UserViewSet(viewsets.ViewSet):
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            cache.delete("users_list") 
             context = {
                 "message": "Your account has been successfully created. Please activate your account by clicking the link sent to your email.",
                 "data": serializer.data,
@@ -53,15 +57,27 @@ class UserViewSet(viewsets.ViewSet):
         return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
     def list(self, request):
+        cache_key = "users_list"
+        cached_users = cache.get(cache_key)
+        if cached_users is not None:
+            return Response(cached_users, status=status.HTTP_200_OK)
+        
         queryset = User.objects.filter(is_active=True)  # Filter for active users
         serializer = UserSerializer(queryset, many=True)
         context = {
             "message": "You have successfully fetched all active users",
             "data": serializer.data,
         }
+  
+        cache.set(cache_key, serializer.data, timeout=60*15)
         return Response(context, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
+        cache_key = f"user_{pk}"
+        cached_user = cache.get(cache_key)
+        if cached_user is not None:
+            return Response(cached_user, status=status.HTTP_200_OK)
+
         try:
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
@@ -75,6 +91,7 @@ class UserViewSet(viewsets.ViewSet):
             "message": "You have successfully fetched user data",
             "data": serializer.data,
         }
+        cache.set(cache_key, context, timeout=60*15)  # Cache for 15 minutes
         return Response(context, status=status.HTTP_200_OK)
 
     def update_user(self, request, pk=None):
@@ -83,10 +100,14 @@ class UserViewSet(viewsets.ViewSet):
             serializer = UserUpdateSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
+                # Invalidate cache
+                cache.delete(f"user_{pk}") 
+                cache.delete("users_list") 
                 context = {
                     "message": "You have successfully updated user data",
                     "data": serializer.data,
                 }
+                cache.set(f"user_{pk}", context, timeout=60*15)
                 return Response(context, status=status.HTTP_200_OK)
             context = {"message": "Something went wrong", "error": serializer.errors}
             return Response(context, status=status.HTTP_400_BAD_REQUEST)
@@ -107,6 +128,9 @@ class UserViewSet(viewsets.ViewSet):
             }
             return Response(context, status=status.HTTP_404_NOT_FOUND)
         user.delete()
+        # Invalidate cache
+        cache.delete(f"user_{pk}") 
+        cache.delete("users_list") 
         context = {"message": "You have successfully deleted the user data"}
         return Response(context, status=status.HTTP_204_NO_CONTENT)
 

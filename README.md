@@ -15,8 +15,7 @@
   - [Running the Application](#running-the-application)
   - [Running Tests](#running-tests)
 - [API Endpoints](#api-endpoints)
-- [Contributing](#contributing)
-- [License](#license)
+- [ERD Diagram](#erd-diagram)
 
 ## Introduction
 
@@ -290,33 +289,19 @@ Certainly! Here is the properly formatted table with the given endpoints and des
 | GET    | `{{base_url}}/users/followers/<id>/` | List followers of a user.               |
 
 
-### Post Service
+### Post Service API Endpoints
 
-| Method | Endpoint                       | Description                             |
-|--------|--------------------------------|-----------------------------------------|
-| POST   | /posts/                        | Create a new post.                      |
-| GET    | /posts/                        | List all posts.                         |
-| GET    | /posts/<id>/                   | Retrieve a specific post.               |
-| PUT    | /posts/<id>/                   | Update a specific post.                 |
-| DELETE | /posts/<id>/                   | Delete a specific post.                 |
-| POST   | /posts/<post_id>/comments/     | Create a comment on a post.             |
-| GET    | /posts/<post_id>/comments/     | List comments on a post.                |
+| Method | Endpoint                          | Description                             |
+|--------|-----------------------------------|-----------------------------------------|
+| POST   | `{{base_url}}/blogs/`             | Create a new post.                      |
+| GET    | `{{base_url}}/blogs/<id>/`        | Retrieve a specific post.               |
+| GET    | `{{base_url}}/blogs/all/`         | List all posts.                         |
+| DELETE | `{{base_url}}/blogs/delete/<id>/` | Delete a specific post.                 |
+| PUT    | `{{base_url}}/blogs/update/<id>/` | Update a specific post.                 |
+| POST   | `{{base_url}}/blogs/comments/`    | Create a comment on a post.             |
+| GET    | `{{base_url}}/blogs/comments/all/` | List all comments.                      |
+| GET    | `{{base_url}}/blogs/comments/<id>/` | Retrieve a specific comment.            |
+| PUT    | `{{base_url}}/blogs/comments/update/<id>/` | Update a specific comment.              |
+| DELETE | `{{base_url}}/blogs/comments/delete/<id>/` | Delete a specific comment.              |
 
-### Notification Service
-
-| Method | Endpoint                       | Description                             |
-|--------|--------------------------------|-----------------------------------------|
-| GET    | /notifications/                | List all notifications for the current user. |
-| POST   | /notifications/read/           | Mark notifications as read.             |
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request for any bugs or features.
-
-## License
-
-This project is licensed under the MIT License.
-
----
-
-This comprehensive README file provides an overview of the project, system design details, setup instructions, and API documentation, displayed in a table format for better readability. It serves as a valuable resource for developers and contributors to understand, set up, and extend the application.
+## ERD Diagram
