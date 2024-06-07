@@ -8,107 +8,160 @@ from social_media_project.apps.post_service.models import User, Post, Comment
 
 @pytest.mark.django_db
 class TestCommentAPI:
+    """
+    Test suite for the Comment API endpoints.
+    """
+
     def setup_method(self):
+        """
+        Setup method to initialize the test client, create a test user, a post, and a comment.
+        This fixture runs before each test method.
+        """
         self.client = APIClient()
         self.user = User.objects.create_user(
-            username='testuser',
-            password='testpass',
-            email='testuser@example.com',
-            is_active=True
+            username="testuser",
+            password="testpass",
+            email="testuser@example.com",
+            is_active=True,
         )
         self.client.force_authenticate(user=self.user)
         self.factory = APIRequestFactory()
-        self.post = Post.objects.create(title='Test Post', content='Test content', user=self.user)
-        self.comment = Comment.objects.create(post=self.post, content='Test comment', user=self.user)
+        self.post = Post.objects.create(
+            title="Test Post", content="Test content", user=self.user
+        )
+        self.comment = Comment.objects.create(
+            post=self.post, content="Test comment", user=self.user
+        )
 
     def test_list_comments(self):
-        url = reverse('list_comments')
+        """
+        Test listing all comments.
+        """
+        url = reverse("list_comments")
         response = self.client.get(url)
+        
         assert response.status_code == status.HTTP_200_OK
-        assert 'data' in response.data
-        assert response.data['message'] == "Comments retrieved successfully"
+        assert "data" in response.data
+        assert response.data["message"] == "Comments retrieved successfully"
 
     def test_create_comment(self):
-        url = reverse('create_comment')
+        """
+        Test creating a new comment.
+        """
+        url = reverse("create_comment")
         data = {
-            'post': self.post.pk,
-            'content': 'New comment',
+            "post": self.post.pk,
+            "content": "New comment",
         }
-        response = self.client.post(url, data, format='json')
-        assert response.status_code == status.HTTP_201_CREATED
-        assert response.data['message'] == "Comment created successfully"
+        response = self.client.post(url, data, format="json")
         
-    
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data["message"] == "Comment created successfully"
+
     def test_create_comment_no_content(self):
-        url = reverse('create_comment')
+        """
+        Test creating a comment with no content.
+        """
+        url = reverse("create_comment")
         data = {
-            'post': self.post.pk,
-            'content': '',
+            "post": self.post.pk,
+            "content": "",
         }
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
+        
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_retrieve_comment(self):
-        url = reverse('retrieve_comment', kwargs={'pk': self.comment.pk})
+        """
+        Test retrieving a single comment.
+        """
+        url = reverse("retrieve_comment", kwargs={"pk": self.comment.pk})
         response = self.client.get(url)
+        
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['data']['content'] == self.comment.content
+        assert response.data["data"]["content"] == self.comment.content
 
     def test_retrieve_comment_not_exist(self):
-        url = reverse('retrieve_comment', kwargs={'pk': 999})
+        """
+        Test retrieving a non-existent comment.
+        """
+        url = reverse("retrieve_comment", kwargs={"pk": 999})
         response = self.client.get(url)
+        
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_update_comment(self):
-        url = reverse('update_comment', kwargs={'pk': self.comment.pk})
+        """
+        Test updating an existing comment.
+        """
+        url = reverse("update_comment", kwargs={"pk": self.comment.pk})
         data = {
-            'post': self.post.id,
-            'content': 'Updated comment',
+            "post": self.post.id,
+            "content": "Updated comment",
         }
-        response = self.client.put(url, data, format='json')
+        response = self.client.put(url, data, format="json")
+        
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['message'] == "Comment updated successfully"
+        assert response.data["message"] == "Comment updated successfully"
 
     def test_update_comment_not_exist(self):
-        url = reverse('update_comment', kwargs={'pk': 999})
+        """
+        Test updating a non-existent comment.
+        """
+        url = reverse("update_comment", kwargs={"pk": 999})
         data = {
-            'content': 'Updated comment',
+            "content": "Updated comment",
         }
-        response = self.client.put(url, data, format='json')
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-    
-    def test_update_comment_no_content(self):
-        url = reverse('update_comment', kwargs={'pk': 999})
-        data = {
-            'content': '',
-        }
-        response = self.client.put(url, data, format='json')
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        response = self.client.put(url, data, format="json")
         
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_update_comment_no_content(self):
+        """
+        Test updating a comment with no content.
+        """
+        url = reverse("update_comment", kwargs={"pk": self.comment.pk})
+        data = {
+            "content": "",
+        }
+        response = self.client.put(url, data, format="json")
+        
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_delete_comment(self):
-        url = reverse('delete_comment', kwargs={'pk': self.comment.pk})
+        """
+        Test deleting an existing comment.
+        """
+        url = reverse("delete_comment", kwargs={"pk": self.comment.pk})
         response = self.client.delete(url)
+        
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_delete_comment_not_exist(self):
-        url = reverse('delete_comment', kwargs={'pk': 999})
+        """
+        Test deleting a non-existent comment.
+        """
+        url = reverse("delete_comment", kwargs={"pk": 999})
         response = self.client.delete(url)
-        assert response.status_code == status.HTTP_404_NOT_FOUND
         
-    
-    @patch('social_media_project.apps.post_service.serializers.CommentSerializer.save', side_effect=Exception('Test exception'))
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @patch(
+        "social_media_project.apps.post_service.serializers.CommentSerializer.save",
+        side_effect=Exception("Test exception"),
+    )
     def test_create_comment_exception(self, mock_save):
         """
-        Test the exception handling in the perform_create method.
+        Test handling exceptions in the comment creation process.
         """
-        url = reverse('create_comment')
+        url = reverse("create_comment")
         data = {
-            'post': self.post.pk,
-            'content': 'New comment',
+            "post": self.post.pk,
+            "content": "New comment",
         }
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
+        
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data['message'] == "Something went wrong"
-        assert 'detail' in response.data['errors']
-        assert response.data['errors']['detail'] == 'Test exception'
+        assert response.data["message"] == "Something went wrong"
+        assert "detail" in response.data["errors"]
+        assert response.data["errors"]["detail"] == "Test exception"

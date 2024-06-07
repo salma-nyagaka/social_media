@@ -11,6 +11,11 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+from django.core.cache import cache
+from rest_framework.decorators import action
+
+from ..notification_service.tasks import send_batch_notifications
 
 from .serializers import (
     UserSerializer,
@@ -18,7 +23,7 @@ from .serializers import (
     UserUpdateSerializer,
     UserLoginAPIViewSerializer,
 )
-from .models import User
+from .models import User, UserFollowing
 
 
 class UserViewSet(viewsets.ViewSet):
@@ -42,6 +47,7 @@ class UserViewSet(viewsets.ViewSet):
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            cache.delete("users_list") 
             context = {
                 "message": "Your account has been successfully created. Please activate your account by clicking the link sent to your email.",
                 "data": serializer.data,
@@ -51,15 +57,27 @@ class UserViewSet(viewsets.ViewSet):
         return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
     def list(self, request):
-        queryset = User.objects.all()
+        cache_key = "users_list"
+        cached_users = cache.get(cache_key)
+        if cached_users is not None:
+            return Response(cached_users, status=status.HTTP_200_OK)
+        
+        queryset = User.objects.filter(is_active=True)  # Filter for active users
         serializer = UserSerializer(queryset, many=True)
         context = {
-            "message": "You have successfully fetched all the users",
+            "message": "You have successfully fetched all active users",
             "data": serializer.data,
         }
+  
+        cache.set(cache_key, serializer.data, timeout=60*15)
         return Response(context, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
+        cache_key = f"user_{pk}"
+        cached_user = cache.get(cache_key)
+        if cached_user is not None:
+            return Response(cached_user, status=status.HTTP_200_OK)
+
         try:
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
@@ -73,8 +91,8 @@ class UserViewSet(viewsets.ViewSet):
             "message": "You have successfully fetched user data",
             "data": serializer.data,
         }
+        cache.set(cache_key, context, timeout=60*15)  # Cache for 15 minutes
         return Response(context, status=status.HTTP_200_OK)
-
 
     def update_user(self, request, pk=None):
         try:
@@ -82,10 +100,14 @@ class UserViewSet(viewsets.ViewSet):
             serializer = UserUpdateSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
+                # Invalidate cache
+                cache.delete(f"user_{pk}") 
+                cache.delete("users_list") 
                 context = {
                     "message": "You have successfully updated user data",
                     "data": serializer.data,
                 }
+                cache.set(f"user_{pk}", context, timeout=60*15)
                 return Response(context, status=status.HTTP_200_OK)
             context = {"message": "Something went wrong", "error": serializer.errors}
             return Response(context, status=status.HTTP_400_BAD_REQUEST)
@@ -106,6 +128,9 @@ class UserViewSet(viewsets.ViewSet):
             }
             return Response(context, status=status.HTTP_404_NOT_FOUND)
         user.delete()
+        # Invalidate cache
+        cache.delete(f"user_{pk}") 
+        cache.delete("users_list") 
         context = {"message": "You have successfully deleted the user data"}
         return Response(context, status=status.HTTP_204_NO_CONTENT)
 
@@ -116,6 +141,85 @@ class UserViewSet(viewsets.ViewSet):
             "data": serializer.data,
         }
         return Response(context, status=status.HTTP_200_OK)
+
+    def follow(self, request, pk=None):
+        user_to_follow = get_object_or_404(User, pk=pk)
+        user = request.user
+        if user == user_to_follow:
+            return Response(
+                {"status": "You cannot follow yourself"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if UserFollowing.objects.filter(
+            user_id=user, following_user_id=user_to_follow
+        ).exists():
+            return Response(
+                {"status": "You are already following this user"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if user != user_to_follow:
+            UserFollowing.objects.create(user_id=user, following_user_id=user_to_follow)
+            context = {
+                "message": "You have successfully followed {}".format(
+                    user_to_follow.username
+                )
+            }
+            send_batch_notifications.delay(
+                subject="New follow alert!",
+                message="You have been followed by {}".format(user.email),
+                recipient_list=[user_to_follow.email],
+                context={},
+                html_template="follow.html",
+                notification_type="follow",
+            )
+
+            return Response(context, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {"status": "You cannot follow yourself"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def unfollow(self, request, pk=None):
+        user_to_unfollow = get_object_or_404(User, pk=pk)
+        user = request.user
+        if user == user_to_unfollow:
+            return Response(
+                {"status": "You cannot unfollow yourself"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not UserFollowing.objects.filter(
+            user_id=user, following_user_id=user_to_unfollow
+        ).exists():
+            return Response(
+                {"status": "You are not following this user"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if user != user_to_unfollow:
+            UserFollowing.objects.filter(
+                user_id=user, following_user_id=user_to_unfollow
+            ).delete()
+            context = {
+                "message": "You have successfully unfollowed {}".format(
+                    user_to_unfollow.username
+                )
+            }
+            return Response(context, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {"status": "You cannot unfollow yourself"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def followers(self, request, pk=None):
+        user = get_object_or_404(User, pk=4)
+        followers = User.objects.filter(following__following_user_id=user)
+        serializer = UserSerializer(followers, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserLoginAPIView(APIView):
@@ -143,6 +247,7 @@ class UserLoginAPIView(APIView):
                     "errors": error_detail.get("errors", {}),
                 }
             return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ActivateAccountAPIView(APIView):
     permission_classes = []  # Allow any

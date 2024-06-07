@@ -1,80 +1,80 @@
 from celery import shared_task
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import send_mass_mail, EmailMultiAlternatives, get_connection
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from django.core.mail import send_mail
+from django.core.mail import send_mail, send_mass_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from django.contrib.sites.shortcuts import get_current_site
-from django.urls import reverse
-from rest_framework_simplejwt.tokens import RefreshToken
-from urllib import request
-import jwt
-from django.utils.html import strip_tags
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-import django
-from django.utils.encoding import force_bytes
 from django.conf import settings
-import datetime
-from django.utils import timezone
-from datetime import datetime, timedelta
+import html2text
 
+from .models import Notification
+from social_media_project.apps.user_service.models import User
 
-secret = settings.SECRET_KEY
+import math
 
-
-@shared_task
-def send_activation_email(user):
-    # uidb64 = urlsafe_base64_encode(force_bytes(user.id))
-    payload = {
-        "email": user.email,
-        "exp": (timezone.now() + timezone.timedelta(hours=24)).timestamp(),
-    }
-
-    exp = datetime.utcnow() + timedelta(hours=24)
-    token = jwt.encode(
-        {"user_id": user.id, "exp": exp}, settings.SECRET_KEY, algorithm="HS256"
-    )
-
-    subject = "User Account Activation Request"
-    domain = settings.DOMAIN_NAME
-    html_message = render_to_string(
-        "activation_email.html",
-        {"context": "{}/users/email_confirmation/{}".format(domain, str(token))},
-    )
-    # import pdb
-    # pdb.set_trace()
-    plain_message = strip_tags(html_message)
-    from_email = "salmanyagaka@gmail.com"
-    to = user.email
-
-    send_mail(subject, plain_message, from_email, [to], html_message=html_message)
+BATCH_SIZE = 100 
 
 
 @shared_task
-def send_email_task(
-    subject,
-    message,
-    from_email,
-    recipient_list,
-    html_template=None,
-    context=None,
-    bcc=None,
+def send_batch_notifications(
+    subject, message, recipient_list, context, html_template, notification_type
 ):
-    if html_template:
-        if context is None:
-            context = {}
-        context["message"] = message
-        html_content = render_to_string(html_template, context)
-        text_content = strip_tags(html_content)
-    else:
-        html_content = message
-        text_content = strip_tags(message)
+    user_emails = recipient_list
+    total_users = len(user_emails)
+    num_batches = math.ceil(total_users / BATCH_SIZE)
 
-    email = EmailMultiAlternatives(
-        subject, text_content, from_email, recipient_list, bcc=bcc
-    )
-    if html_template:
+    for batch_num in range(num_batches):
+        batch_emails = user_emails[
+            batch_num * BATCH_SIZE : (batch_num + 1) * BATCH_SIZE
+        ]
+        email_messages = []
+
+        for email in batch_emails:
+            user_obj = User.objects.get(email=email)
+            # Save notification to the database
+            notification = Notification.objects.create(
+                sender=settings.DEFAULT_FROM_EMAIL,
+                receiver=user_obj,
+                notification_type=notification_type,  # Adjust as needed
+                text=message,
+            )
+
+            context.update(context)
+            context["message"] = message
+            context["notification"] = notification
+            html_content = render_to_string(html_template, context)
+            text_content = html2text.html2text(html_content)
+
+            email_messages.append(
+                (
+                    subject,
+                    text_content,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    html_content,
+                )
+            )
+
+        # Send emails in bulk
+        send_bulk_emails(email_messages)
+
+    return f"Notifications sent to {total_users} users in {num_batches} batches."
+
+
+def send_bulk_emails(email_messages):
+    connection = get_connection()
+    emails = []
+    for (
+        subject,
+        text_content,
+        from_email,
+        recipient_list,
+        html_content,
+    ) in email_messages:
+        email = EmailMultiAlternatives(
+            subject, text_content, from_email, recipient_list, connection=connection
+        )
         email.attach_alternative(html_content, "text/html")
-
-    email.send()
+        emails.append(email)
+    connection.send_messages(emails)

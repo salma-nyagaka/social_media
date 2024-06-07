@@ -3,13 +3,13 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django.conf import settings
+from django.core.cache import cache
+
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
-
-# from social_media_project.apps.notification_service.kafka_utils import send_notification_to_kafka
-from ..notification_service.tasks import send_email_task
+from ..notification_service.tasks import send_batch_notifications
 from ..user_service.models import User
-from django.conf import settings
 
 
 class BlogPostViewSet(viewsets.ViewSet):
@@ -20,13 +20,18 @@ class BlogPostViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
+        cache_key = "posts_list"
+        cached_posts = cache.get(cache_key)
+        if cached_posts is not None:
+            return Response(cached_posts, status=status.HTTP_200_OK)
+
         queryset = Post.objects.all()
         serializer = PostSerializer(queryset, many=True)
         response_data = {
             "message": "Post retrieved successfully",
             "data": serializer.data,
         }
-
+        cache.set(cache_key, response_data, timeout=60*15) 
         return Response(response_data, status=status.HTTP_200_OK)
 
     def create(self, request):
@@ -36,17 +41,21 @@ class BlogPostViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
+        cache_key = f"post_{pk}"
+        cached_post = cache.get(cache_key)
+        
         try:
             post = Post.objects.get(pk=pk)
+            serializer = PostSerializer(post)
+            response_data = {
+                "message": "Post retrieved successfully",
+                "data": serializer.data,
+            }
+            cache.set(cache_key, response_data, timeout=60*15) 
+            return Response(response_data, status=status.HTTP_200_OK)
         except Post.DoesNotExist as e:
             error_response = {"message": "Something went wrong", "errors": str(e)}
             return Response(error_response, status=status.HTTP_404_NOT_FOUND)
-        serializer = PostSerializer(post)
-        response_data = {
-            "message": "Post retriEved successfully",
-            "data": serializer.data,
-        }
-        return Response(response_data, status=status.HTTP_200_OK)
 
     def update(self, request, pk=None):
         try:
@@ -54,10 +63,13 @@ class BlogPostViewSet(viewsets.ViewSet):
             serializer = PostSerializer(post, data=request.data)
             if serializer.is_valid():
                 serializer.save()
+                cache.delete(f"post_{pk}")
+                cache.delete("posts_list")
                 response_data = {
                     "message": "Post updated successfully",
                     "data": serializer.data,
                 }
+                cache.set(f"post_{pk}", response_data, timeout=60*15)
                 return Response(response_data, status=status.HTTP_200_OK)
             else:
                 error_response = {
@@ -75,11 +87,12 @@ class BlogPostViewSet(viewsets.ViewSet):
         except Post.DoesNotExist as e:
             error_response = {"message": "Something went wrong", "errors": str(e)}
             return Response(error_response, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            error_response = {"message": "Something went wrong", "errors": str(e)}
-            return Response(error_response, status=status.HTTP_404_NOT_FOUND)
 
         post.delete()
+        
+        # Invalidate cache
+        cache.delete(f"post_{pk}")
+        cache.delete("posts_list")
         response_data = {"message": "Post deleted successfully"}
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)
 
@@ -87,37 +100,34 @@ class BlogPostViewSet(viewsets.ViewSet):
         """
         Save the post with the current user as the author and send notifications.
         """
-        try:
-            title = serializer.validated_data.get("title", "No topic")
-            post_id = serializer.validated_data.get("post_id", "No id")
-            if title:
-                receiver_emails = list(
-                    User.objects.filter(is_active=True).values_list("email", flat=True)
-                )
-                # Send email notification after post is created
-                send_email_task.delay(
-                    subject="New Post Created",
-                    message=f'A new post titled "{title}" has been created.',
-                    from_email="salmanyagaka@gmail.com",
-                    recipient_list=[],
-                    html_template="new_post.html",
-                    context={
-                        "post_url": "{}/blogs/posts/{}/".format(
-                            settings.DOMAIN_NAME, post_id
-                        )
-                    },
-                    bcc=receiver_emails,
-                )
-            post = serializer.save(user=self.request.user)
-            response_data = {
-                "message": "Post created successfully",
-                "data": serializer.data,
-            }
-            return Response(response_data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            error_response = {"message": "Something went wrong", "errors": str(e)}
-            return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
-
+        title = serializer.validated_data.get("title", "No topic")
+        post_id = serializer.validated_data.get("id", "No id")
+        if title:
+            receiver_emails = list(
+                User.objects.filter(is_active=True).values_list("email", flat=True)
+            )
+            # Send email notification after post is created
+            send_batch_notifications.delay(
+                subject="New Post Created",
+                message=f'A new post titled "{title}" has been created.',
+                recipient_list=receiver_emails,
+                context={
+                    "post_url": "{}/blogs/{}/".format(settings.DOMAIN_NAME, post_id)
+                },
+                html_template="new_post.html",
+                notification_type="post",
+            )
+        post = serializer.save(user=self.request.user)
+        response_data = {
+            "message": "Post created successfully",
+            "data": serializer.data,
+        }
+        
+        # Invalidate the posts list cache
+        cache.delete("posts_list")
+        
+        return Response(response_data, status=status.HTTP_201_CREATED)
+   
 
 class CommentViewSet(viewsets.ViewSet):
     """
@@ -130,12 +140,18 @@ class CommentViewSet(viewsets.ViewSet):
         """
         Retrieve all comments.
         """
+        cache_key = "comments_list"
+        cached_comments = cache.get(cache_key)
+        if cached_comments is not None:
+            return Response(cached_comments, status=status.HTTP_200_OK)
+
         queryset = Comment.objects.all()
         serializer = CommentSerializer(queryset, many=True)
         response_data = {
             "message": "Comments retrieved successfully",
             "data": serializer.data,
         }
+        cache.set(cache_key, response_data, timeout=60*15)
         return Response(response_data, status=status.HTTP_200_OK)
 
     def create(self, request):
@@ -151,6 +167,12 @@ class CommentViewSet(viewsets.ViewSet):
         """
         Retrieve a single comment.
         """
+        
+        cache_key = f"comment_{pk}"
+        cached_comment = cache.get(cache_key)
+        if cached_comment is not None:
+            return Response(cached_comment, status=status.HTTP_200_OK)
+
         try:
             comment = Comment.objects.get(pk=pk)
         except Comment.DoesNotExist:
@@ -160,6 +182,7 @@ class CommentViewSet(viewsets.ViewSet):
             "message": "Comment retrieved successfully",
             "data": serializer.data,
         }
+        cache.set(cache_key, response_data, timeout=60*15)
         return Response(response_data, status=status.HTTP_200_OK)
 
     def update(self, request, pk=None):
@@ -172,10 +195,13 @@ class CommentViewSet(viewsets.ViewSet):
             serializer = CommentSerializer(comment, data=request.data)
             if serializer.is_valid():
                 serializer.save()
+                cache.delete(f"comment_{pk}") 
+                cache.delete("comments_list") 
                 response_data = {
                     "message": "Comment updated successfully",
                     "data": serializer.data,
                 }
+                cache.set(f"comment_{pk}", response_data, timeout=60*15)
                 return Response(response_data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Comment.DoesNotExist as e:
@@ -191,6 +217,8 @@ class CommentViewSet(viewsets.ViewSet):
         except Comment.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         comment.delete()
+        cache.delete(f"comment_{pk}")
+        cache.delete("comments_list") 
         return Response(
             {"message": "Comment deleted successfully"},
             status=status.HTTP_204_NO_CONTENT,
@@ -212,25 +240,26 @@ class CommentViewSet(viewsets.ViewSet):
                 receiver_emails = list(
                     User.objects.filter(is_active=True).values_list("email", flat=True)
                 )
-                send_email_task.delay(
+                send_batch_notifications.delay(
                     subject="New comment has been added to the post: {}".format(
                         post.title
                     ),
                     message=content,
-                    from_email="salmanyagaka@gmail.com",
-                    recipient_list=[],
-                    html_template="new_comment.html",
+                    recipient_list=receiver_emails,
                     context={
-                        "post_url": "{}/blogs/comments/{}/".format(
+                        "post_url": "{}/blogs/{}/".format(
                             settings.DOMAIN_NAME, comment_id
                         )
                     },
-                    bcc=receiver_emails,
+                    html_template="new_comment.html",
+                    notification_type="comment",
                 )
             response_data = {
                 "message": "Comment created successfully",
                 "data": serializer.data,
             }
+            # Invalidate the comments list cache
+            cache.delete("comments_list")
             return Response(response_data, status=status.HTTP_201_CREATED)
         except Exception as e:
             error_response = {
