@@ -20,6 +20,4 @@
 # docker stop $(docker ps -q) || true
 # docker rm $(docker ps -a -q) || true
 #!/bin/bash
-# Install Docker
 apt-get update
-apt-get install -y docker.io
