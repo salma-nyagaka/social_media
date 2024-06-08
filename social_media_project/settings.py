@@ -16,7 +16,8 @@ from datetime import timedelta
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-
+# settings.py
+import sentry_sdk
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', '')
+SECRET_KEY="django-insecure-xi@@*gceecx#9^^311qpn6#l-e=ydu!5#9uxjrna5=7fw*ch^^"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -90,13 +91,13 @@ WSGI_APPLICATION = "social_media_project.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv('DATABASE_NAME', ''),
-        "USER": os.getenv('DATABASE_USER', ''),
-        "PASSWORD": os.getenv('DATABASE_PASSWORD', ''),
-        "HOST": os.getenv('DATABASE_HOST', ''),
-        "PORT": os.getenv('DATABASE_PORT', ''),
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'social_media_project',
+        'USER': 'salmanyagaka',
+        'PASSWORD': 'salma',  # Use the same password you set in docker-compose.yml
+        'HOST': 'db',  # Use the service name defined in docker-compose.yml
+        'PORT': '5432',
     }
 }
 
@@ -183,7 +184,7 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', '')
 
 
 # settings.py
-CELERY_BROKER_URL = "amqp://localhost"
+CELERY_BROKER_URL = 'amqp://salmanyagaka:salma@rabbitmq:5672//' 
 CELERY_RESULT_BACKEND = "rpc://"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
@@ -204,9 +205,6 @@ CACHES = {
     }
 }
 
-
-# settings.py
-import sentry_sdk
 
 sentry_sdk.init(
     dsn="https://4f59239970b87c64005a1439e5d93405@o4507386132889600.ingest.us.sentry.io/4507386135314432",
