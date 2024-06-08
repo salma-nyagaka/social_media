@@ -24,12 +24,12 @@ RUN pip install psycopg2-binary
 COPY . .
 
 # Command to run your application
-# CMD ["python", "app.py"]
-# Make port 8000 available to the world outside this container
-EXPOSE 8000
+CMD ["python", "app.py"]
+#  Make port 8000 available to the world outside this container
+# EXPOSE 8000
 
-# Define environment variable
-ENV NAME World
+# # Define environment variable
+# ENV NAME World
 
-# Run Gunicorn server
-CMD ["gunicorn", "--workers", "3", "--bind", "0.0.0.0:8000", "social_media_project.wsgi:application"]
+# # Run Gunicorn server
+# CMD ["gunicorn", "--workers", "3", "--bind", "0.0.0.0:8000", "your_project_name.wsgi:application"]
