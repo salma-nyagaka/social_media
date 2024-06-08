@@ -35,8 +35,17 @@
 # sudo docker run -d -p 8080:8000 --name myapp social_media_image
 #!/bin/bash
 # Navigate to project directory
+# cd /opt/twiga/social_media
+
+# # Build Docker containers
+# docker-compose down
+# docker-compose up --build
+#!/bin/bash
+# Navigate to project directory
 cd /opt/twiga/social_media
 
-# Build Docker containers
+# Pull the pre-built Docker images
+docker-compose pull
+
+# Remove any existing containers
 docker-compose down
-docker-compose up --build
