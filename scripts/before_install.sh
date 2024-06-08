@@ -1,9 +1,9 @@
 # #!/bin/bash
 # echo "Before install script running..."
 # # Remove existing files if they exist
-# if [ -f /home/ubuntu/opt/twiga/social_media/social_media_project/Dockerfile ]; then
-#     sudo rm /home/ubuntu/opt/twiga/social_media/social_media_project/Dockerfile
-# fi
+if [ -f /opt/twiga/social_media ]; then
+    sudo rm /opt/twiga/social_media
+fi
 
 
 # # Ensure sudo is available and stop any service running on port 80

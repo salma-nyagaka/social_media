@@ -6,7 +6,7 @@
 # # sudo docker rm myapp || true
 
 # # # Copy the latest files to the target directory
-# # sudo cp -r /home/ubuntu/opt/twiga/social_media/social_media_project /home/ubuntu/opt/twiga/social_media/deployed_app
+# sudo cp -r /home/ubuntu/opt/twiga/social_media/social_media_project /home/ubuntu/opt/twiga/social_media/deployed_app
 
 # # # Navigate to the project directory
 # # cd /home/ubuntu/opt/twiga/social_media/social_media_project
