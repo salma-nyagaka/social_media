@@ -39,4 +39,4 @@ cd /opt/twiga/social_media
 
 # Build Docker containers
 docker-compose down
-docker-compose build
+docker-compose up --build
