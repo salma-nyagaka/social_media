@@ -47,5 +47,6 @@ cd /opt/twiga/social_media
 # Pull the pre-built Docker images
 docker-compose pull
 
+
 # Remove any existing containers
 docker-compose down
