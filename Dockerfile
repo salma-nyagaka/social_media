@@ -27,4 +27,5 @@ COPY . .
 
 # Command to run your application
 # CMD ["python", "app.py"]
+# ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "social_media_project.wsgi:application"]
