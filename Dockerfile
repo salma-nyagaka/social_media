@@ -1,7 +1,4 @@
-# Use the official Python image from the Docker Hub
 FROM python:3.12-slim
-
-
 
 # Install system dependencies for building Python packages
 RUN apt-get update && apt-get install -y \
@@ -21,11 +18,13 @@ COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install psycopg2-binary
+RUN pip install psycopg2-binary gunicorn
+
+# Verify Gunicorn installation
+RUN gunicorn --version
+
 # Copy the rest of your application code into the container
 COPY . .
 
 # Command to run your application
-# CMD ["python", "app.py"]
-# ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "social_media_project.wsgi:application"]

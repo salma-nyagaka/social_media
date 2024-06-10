@@ -14,19 +14,17 @@ services:
     image: redis:6
 
   rabbitmq:
-    build: .
+    image: rabbitmq:3-management
     environment:
       RABBITMQ_DEFAULT_USER: salmanyagaka
       RABBITMQ_DEFAULT_PASS: salma
     ports:
-      - "15672:15672"  # Management interface
-      - "5672:5672"    # RabbitMQ broker port
+      - "15672:15672"
+      - "5672:5672"
 
   web:
-    image: limsapi/social_media:latest
-    # build: .
+    build: .
     command: ["gunicorn", "--bind", "0.0.0.0:8000", "social_media_project.wsgi:application"]
-    # command: ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
     volumes:
       - .:/app
     ports:
