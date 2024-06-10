@@ -23,7 +23,7 @@ services:
       - "5672:5672"
 
   web:
-    build: .
+    image: limsapi/social_media:latest
     command: ["gunicorn", "--bind", "0.0.0.0:8000", "social_media_project.wsgi:application"]
     volumes:
       - .:/app
@@ -36,7 +36,7 @@ services:
 
   celery:
     build: .
-    command: ["sh", "-c", "/wait-for-it.sh rabbitmq:5672 -- celery -A your_project_name worker --loglevel=info"]
+    command: ["sh", "-c", "/wait-for-it.sh rabbitmq:5672 -- celery -A social_media_project worker --loglevel=info"]
     volumes:
       - .:/app
     depends_on:
@@ -46,7 +46,7 @@ services:
 
   celery-beat:
     build: .
-    command: ["sh", "-c", "/wait-for-it.sh rabbitmq:5672 -- celery -A your_project_name beat --loglevel=info"]
+    command: ["sh", "-c", "/wait-for-it.sh rabbitmq:5672 -- celery -A social_media_project beat --loglevel=info"]
     volumes:
       - .:/app
     depends_on:
