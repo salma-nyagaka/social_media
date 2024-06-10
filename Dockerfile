@@ -26,4 +26,5 @@ RUN pip install psycopg2-binary
 COPY . .
 
 # Command to run your application
-CMD ["python", "app.py"]
+# CMD ["python", "app.py"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "social_media_project.wsgi:application"]
