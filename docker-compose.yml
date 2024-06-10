@@ -24,10 +24,7 @@ services:
 
   web:
     image: limsapi/social_media:latest
-    command: >
-      sh -c "python manage.py makemigrations &&
-             python manage.py migrate &&
-             gunicorn --bind 0.0.0.0:8000 social_media_project.wsgi:application"
+    command: ["gunicorn", "--bind", "0.0.0.0:8000", "social_media_project.wsgi:application"]
     volumes:
       - .:/app
     ports:
