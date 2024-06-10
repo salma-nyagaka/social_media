@@ -34,7 +34,7 @@ DEBUG = True
 ROOT_URLCONF = "social_media_project.urls"
 
 
-ALLOWED_HOSTS = ["52.90.160.169", "127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["54.145.62.70", "127.0.0.1", "localhost"]
 
 
 # Application definition
