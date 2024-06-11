@@ -38,10 +38,8 @@ Each microservice is responsible for a specific aspect of the application and op
 
 ### Authentication
 
-To secure our endpoints and manage authentication, we  have used JSON Web Tokens (JWT). After logging in, pass the token as follows. You can also include it in your environemnt settings
-```bash 
-Bearer {{token}}
-```
+To secure our endpoints and manage authentication, we  have used JSON Web Tokens (JWT). After logging in, copy the token, select **Authorization** on postman,
+choose **Bearer Token** then paste your token. You can also include it in your environment settings and pass the variable name holding the token
 
 
 ### Communication Protocols
@@ -81,7 +79,7 @@ To improve performance and scalability, caching mechanisms via the Redis server 
    git clone https://github.com/salma-nyagaka/social_media.git
    cd social_media_project
    ```
-   
+
 
 ### Running the Application
 1.  **Update .env file**:
