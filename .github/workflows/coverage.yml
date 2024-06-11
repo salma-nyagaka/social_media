@@ -8,26 +8,27 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          
       - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
-      - setup_remote_docker:
-          version: 20.10.7
+          python-version: '3.12'
+          
+      - name: Setup Docker
+        uses: docker/setup-buildx-action@v2
 
       # Build Docker image
-      - run:
-          name: Build Docker image
-          command: docker-compose  up --build
+      - name: Build Docker image
+        run: docker-compose up --build
 
-      # Run tests
-      - run:
-          name: Run tests in image
-          command: docker-compose run test
+      # Run tests in image
+      - name: Run tests in image
+        run: docker-compose run test
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
-          token: 5dcfad2a-05bd-4c34-8096-f5a1c7292ffd
+          token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
           flags: unittests
           name: codecov-umbrella
