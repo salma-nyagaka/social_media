@@ -85,6 +85,7 @@
 #!/bin/bash
 
 # Clean up any existing Docker installations
+# Clean up any existing Docker installations
 sudo apt-get remove -y docker docker-engine docker.io containerd runc
 
 # Clean up unnecessary files to free up space

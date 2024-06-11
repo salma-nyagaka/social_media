@@ -24,6 +24,7 @@ urlpatterns = [
     path("all/", list_users, name="list_users"),
     path("<int:pk>/", retrieve_user, name="retrieve_user"),
     path("delete/<int:pk>/", delete_user, name="delete_user"),
+    path("my_profile/", get_current_user, name="get_current_user"),
     path(
         "email_confirmation/<str:token>/",
         ActivateAccountAPIView.as_view(),
