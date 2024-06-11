@@ -280,13 +280,13 @@ Certainly! Here is the properly formatted table with the given endpoints and des
 | POST   | `{{base_url}}/users/create_user/` | Create a new user.                      |
 | POST   | `{{base_url}}/users/login/`       | User login.                             |
 | GET    | `{{base_url}}/users/get_current_user/` | Get the current authenticated user.     |
-| PATCH  | `{{base_url}}/users/update/<id>/` | Update a specific user.                 |
+| PATCH  | `{{base_url}}/users/update/<id>/` | Update profile                 |
 | GET    | `{{base_url}}/users/all`          | List all active users.                  |
 | GET    | `{{base_url}}/users/<id>/`        | Retrieve a specific user.               |
-| DELETE | `{{base_url}}/users/delete/<id>/` | Delete a specific user.                 |
+| DELETE | `{{base_url}}/users/delete/<id>/` | Delete own profile               |
 | POST   | `{{base_url}}/users/follow/<id>/` | Follow a user.                          |
 | POST   | `{{base_url}}/users/unfollow/<id>/` | Unfollow a user.                        |
-| GET    | `{{base_url}}/users/followers/<id>/` | List followers of a user.               |
+| GET    | `{{base_url}}/users/followers` | List followers of a user.               |
 
 
 ### Post Service API Endpoints
@@ -296,12 +296,12 @@ Certainly! Here is the properly formatted table with the given endpoints and des
 | POST   | `{{base_url}}/blogs/`             | Create a new post.                      |
 | GET    | `{{base_url}}/blogs/<id>/`        | Retrieve a specific post.               |
 | GET    | `{{base_url}}/blogs/all/`         | List all posts.                         |
-| DELETE | `{{base_url}}/blogs/delete/<id>/` | Delete a specific post.                 |
-| PUT    | `{{base_url}}/blogs/update/<id>/` | Update a specific post.                 |
+| PUT    | `{{base_url}}/blogs/update/<id>/` | Update user's post.                 |
+| DELETE | `{{base_url}}/blogs/delete/<id>/` | Delete user's post.                 |
 | POST   | `{{base_url}}/blogs/comments/`    | Create a comment on a post.             |
 | GET    | `{{base_url}}/blogs/comments/all/` | List all comments.                      |
 | GET    | `{{base_url}}/blogs/comments/<id>/` | Retrieve a specific comment.            |
-| PUT    | `{{base_url}}/blogs/comments/update/<id>/` | Update a specific comment.              |
-| DELETE | `{{base_url}}/blogs/comments/delete/<id>/` | Delete a specific comment.              |
+| PUT    | `{{base_url}}/blogs/comments/update/<id>/` | Update a  comment.              |
+| DELETE | `{{base_url}}/blogs/comments/delete/<id>/` | Delete a comment.              |
 
 ## ERD Diagram

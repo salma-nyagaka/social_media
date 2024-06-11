@@ -314,6 +314,7 @@ class CommentViewSet(viewsets.ViewSet):
                         followers__user_id=self.request.user.id
                     ).values_list("email", flat=True)
                 )
+                
                 send_batch_notifications.delay(
                     subject="New comment has been added to the post: {}".format(
                         post.title

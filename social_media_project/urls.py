@@ -27,9 +27,6 @@ urlpatterns = [
     path("blogs/", include("social_media_project.apps.post_service.urls")),
     path("sentry-debug/", trigger_error),
     # Swagger documentation URL
-    path(
-        "swagger/",
-        schema_view.with_ui("swagger", cache_timeout=0),
-        name="schema-swagger-ui",
-    ),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
