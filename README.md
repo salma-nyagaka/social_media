@@ -1,6 +1,7 @@
 [![codecov](https://codecov.io/gh/salma-nyagaka/social_media/graph/badge.svg?token=OCYCVUXSBN)](https://codecov.io/gh/salma-nyagaka/social_media)
 ## Table of Contents
 
+
 1. [Introduction](#introduction)
 2. [System Design](#system-design)
    - [Microservices Architecture](#microservices-architecture)
@@ -10,12 +11,13 @@
    - [Prerequisites](#prerequisites)
    - [Installation](#installation)
 4. [Running the Application](#running-the-application)
-6. [Sentry Configuration](#sentry-configuration)
-7. [API Endpoints](#api-endpoints)
+5. [Sentry Configuration](#sentry-configuration)
+6. [API Endpoints](#api-endpoints)
    - [User Service API Endpoints](#user-service-api-endpoints)
    - [Post Service API Endpoints](#post-service-api-endpoints)
-8. [ERD Diagram](#erd-diagram)
-9. [Collection](#collection)
+7. [ERD Diagram](#erd-diagram)
+8. [Collection](#collection)
+
 
 ## Introduction
 
@@ -36,8 +38,9 @@ Each microservice is responsible for a specific aspect of the application and op
 ### Communication Protocols
 
 The microservices communicate asynchronously using RabbitMQ as the message broker. This ensures efficient and reliable delivery of messages between services.
+The setup in the settings file ensures that your Django application can send emails via the specified SMTP server using the credentials provided.
 
-- **User Service** sends messages to the Notification Service when a user follows another user.
+- **User Service** sends messages to the Notification Service when a user follows another user and send an activation email to the user's account.
 - **Post Service** sends messages to the Notification Service when a new post or comment is created.
 
 ### Data Storage Strategies
@@ -69,6 +72,8 @@ To improve performance and scalability, caching mechanisms are used to reduce da
    git clone https://github.com/salma-nyagaka/social_media.git
    cd social_media_project
    ```
+
+
 
 ### Running the Application
 1.  **Update .env file**:
