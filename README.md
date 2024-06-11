@@ -59,6 +59,7 @@ To improve performance and scalability, caching mechanisms are used to reduce da
 - PostgreSQL 16
 - RabbitMQ
 - Celery
+- Redis
 - Sentry account
 
 ### Installation
@@ -97,6 +98,8 @@ To monitor and debug issues in your application, you can integrate Sentry, an er
    - You can test if Sentry is correctly set up by triggering an error in your application and checking if it appears in your Sentry dashboard.
 
    - You should have something like this incase of an error
+     <img width="1506" alt="Screenshot 2024-06-11 at 20 45 33" src="https://github.com/salma-nyagaka/social_media/assets/36000749/bbaaba47-1b08-4c39-9906-a241666d52f0">
+
    
 ## API Endpoints
 ### User Service API Endpoints
