@@ -81,8 +81,7 @@ To improve performance and scalability, caching mechanisms via the Redis server 
    git clone https://github.com/salma-nyagaka/social_media.git
    cd social_media_project
    ```
-
-
+   
 
 ### Running the Application
 1.  **Update .env file**:
