@@ -114,4 +114,4 @@ To improve performance and scalability, caching mechanisms are used to reduce da
 | DELETE | `{{base_url}}/blogs/comments/delete/<id>/` | Delete a comment.              |
 
 ## ERD Diagram
-![smaerd](https://github.com/salma-nyagaka/social_media/assets/36000749/4590843b-cd12-4920-88ed-25b22c407812)
+![sma drawio](https://github.com/salma-nyagaka/social_media/assets/36000749/8a39bb70-0dd4-4f99-9ad1-005b2d0b7a34)
