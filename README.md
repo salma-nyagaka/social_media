@@ -41,6 +41,7 @@ Each microservice is responsible for a specific aspect of the application and op
 To secure our endpoints and manage authentication, we  have used JSON Web Tokens (JWT). After logging in, copy the token, select **__Authorization__** on postman,
 choose **__Bearer Token__** then paste your **Token**. You can also include it in your environment settings and pass the variable name holding the token
 
+![Uploading Screenshot 2024-06-11 at 23.36.09.png…]()
 
 ### Communication Protocols
 
