@@ -1,5 +1,5 @@
 ### README
-
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/salma-nyagaka/social_media/tree/develop.svg?style=svg&circle-token=CCIPRJ_U12h31RdrTpzEbmX3jXeNp_9c19d6486298ee0cb0254d0dd3054c66f1da7c1e)](https://dl.circleci.com/status-badge/redirect/gh/salma-nyagaka/social_media/tree/develop)
 # Social Media Project
 
 ## Table of Contents
