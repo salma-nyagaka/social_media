@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 from django.core.cache import cache
 from rest_framework.decorators import action
 
@@ -231,7 +232,13 @@ class UserViewSet(viewsets.ViewSet):
         Returns:
             Response: A response indicating the success or failure of the follow action.
         """
-        user_to_follow = get_object_or_404(User, pk=pk)
+        try:
+            user_to_follow = get_object_or_404(User, pk=pk)
+        except Http404:
+            return Response(
+                {"status": "User does not exists"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         user = request.user
  
         if user_to_follow.is_active == False:

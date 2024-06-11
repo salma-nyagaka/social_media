@@ -43,8 +43,8 @@ class UserSerializer(serializers.ModelSerializer):
         followers = obj.followers.all()
         return [
             {
-                "user_id": follower.following_user_id.id,
-                "username": follower.following_user_id.username,
+                "user_id": follower.user_id.id,
+                "username": follower.user_id.username,
                 "user_follow_id": follower.id,
             }
             for follower in followers
