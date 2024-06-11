@@ -38,8 +38,8 @@ Each microservice is responsible for a specific aspect of the application and op
 
 ### Authentication
 
-To secure our endpoints and manage authentication, we  have used JSON Web Tokens (JWT). After logging in, copy the token, select **Authorization** on postman,
-choose **Bearer Token** then paste your token. You can also include it in your environment settings and pass the variable name holding the token
+To secure our endpoints and manage authentication, we  have used JSON Web Tokens (JWT). After logging in, copy the token, select **__Authorization__** on postman,
+choose **__Bearer Token__** then paste your **Token**. You can also include it in your environment settings and pass the variable name holding the token
 
 
 ### Communication Protocols
@@ -114,7 +114,7 @@ To monitor and debug issues in your application, you can integrate Sentry, an er
 
    
 ## API Endpoints
-**_Create an environment with a `base_url` and a token (generated upon login) that will be accessible by our endpoints._**
+**_Create a `base_url` ain the environemt select and a `token` (generated upon login) that will be used by by our endpoints._**
 
 ### User Service API Endpoints
 
