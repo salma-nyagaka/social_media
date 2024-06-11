@@ -5,7 +5,10 @@ services:
     image: postgres:13
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+    environment:
+      POSTGRES_DB: social_media_project
+      POSTGRES_USER: salmanyagaka
+      POSTGRES_PASSWORD: 'salma'
 
   redis:
     image: redis:6
@@ -15,8 +18,6 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: salmanyagaka
       RABBITMQ_DEFAULT_PASS: salma
-    env_file:
-      - .env
     ports:
       - "15672:15672"
       - "5672:5672"
@@ -24,7 +25,6 @@ services:
   web:
     build:
       context: .
-    #image: limsapi/social_media:latest
     command: ["sh", "-c", "until python manage.py makemigrations && python manage.py migrate; do echo 'Waiting for db...'; sleep 5; done && gunicorn --bind 0.0.0.0:8000 social_media_project.wsgi:application"]
     volumes:
       - .:/app
@@ -34,8 +34,6 @@ services:
       - db
       - redis
       - rabbitmq
-    env_file:
-      - .env
 
   celery:
     build:
@@ -47,8 +45,6 @@ services:
       - db
       - redis
       - rabbitmq
-    env_file:
-      - .env
 
   celery-beat:
     build:
@@ -60,8 +56,6 @@ services:
       - db
       - redis
       - rabbitmq
-    env_file:
-      - .env
 
 volumes:
   postgres_data:
