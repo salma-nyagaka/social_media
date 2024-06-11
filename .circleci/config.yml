@@ -19,7 +19,7 @@ jobs:
     # See: https://circleci.com/docs/executor-intro/ & https://circleci.com/docs/configuration-reference/#executor-job
     docker:
       # Specify the version you desire here
-      # See:https://circleci.com/developer/images/image/cimg/python
+      # See: https://circleci.com/developer/images/image/cimg/python
       - image: cimg/python:3.12
 
     # Add steps to the job
@@ -27,13 +27,10 @@ jobs:
     steps:
       # Checkout the code as the first step.
       - checkout
-      - python/install-packages:
-          pkg-manager: pip
-          # app-dir: ~/project/package-directory/  # If your requirements.txt isn't in the root directory.
-          # pip-dependency-file: test-requirements.txt  # if you have a different name for your requirements file, maybe one that combines your runtime and test requirements.
-     - run:
+      # Install dependencies from requirements.txt
+      - run:
           name: Install dependencies
-          command: pip install psycopg2-binary
+          command: pip install -r requirements.txt
       - run:
           name: Run tests
           # This assumes pytest is installed via the install-package step above
