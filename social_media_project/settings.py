@@ -98,10 +98,10 @@ WSGI_APPLICATION = "social_media_project.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "social_media_project",
-        "USER": "salmanyagaka",
-        "PASSWORD": "salma",  # Use the same password you set in docker-compose.yml
-        "HOST": "db",  # Use the service name defined in docker-compose.yml
+        "NAME": os.getenv('DATABASE_NAME', ''),
+        "USER": os.getenv('DATABASE_USER', ''),
+        "PASSWORD": os.getenv('DATABASE_PASSWORD', ''),
+        "HOST":os.getenv('DATABASE_HOST', ''),
         "PORT": "5432",
     }
 }

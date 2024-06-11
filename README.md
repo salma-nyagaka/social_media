@@ -75,6 +75,7 @@ To improve performance and scalability, caching mechanisms are used to reduce da
    docker-compose up --build
    ```
 
+
 2. **Run the tests**:
    ```bash
    docker-compose run tests
