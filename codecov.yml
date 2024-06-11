@@ -1,2 +1,28 @@
-codecov: 
- token: 5dcfad2a-05bd-4c34-8096-f5a1c7292ffd
+name: Workflow for Codecov example-python
+on: [push, pull_request]
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Install psyco
+        run: pip install psycopg2-binary
+      - name: Run tests
+        run: |
+          pytest
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: 5dcfad2a-05bd-4c34-8096-f5a1c7292ffd
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
