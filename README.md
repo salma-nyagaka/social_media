@@ -114,7 +114,7 @@ To monitor and debug issues in your application, you can integrate Sentry, an er
 
    
 ## API Endpoints
-**_Create a `base_url` ain the environemt select and a `token` (generated upon login) that will be used by by our endpoints._**
+**_Create a `base_url` and a `token` (generated upon login)   in the selected environment that will be used by by our endpoints._**
 
 ### User Service API Endpoints
 
