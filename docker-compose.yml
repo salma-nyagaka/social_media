@@ -63,5 +63,18 @@ services:
       - rabbitmq
     env_file:
       - .env
+
+  test:
+    build:
+      context: .
+    command: ["sh", "-c", "until python manage.py makemigrations && python manage.py migrate; do echo 'Waiting for db...'; sleep 5; done && pytest --cov=social_media_project/apps --cov-report=term-missing --cov-report=html"]
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+    env_file:
+      - .env
 volumes:
   postgres_data:
