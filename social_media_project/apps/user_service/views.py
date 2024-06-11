@@ -7,14 +7,12 @@ from datetime import datetime
 from django.utils.timezone import make_aware
 from django.shortcuts import render
 from django.utils import timezone
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from django.core.cache import cache
-from rest_framework.decorators import action
 
 from ..notification_service.tasks import send_batch_notifications
 
