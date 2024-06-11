@@ -1,4 +1,4 @@
-### README
+<!-- ### README
 
 # Social Media Project
 
@@ -304,4 +304,184 @@ Certainly! Here is the properly formatted table with the given endpoints and des
 | PUT    | `{{base_url}}/blogs/comments/update/<id>/` | Update a specific comment.              |
 | DELETE | `{{base_url}}/blogs/comments/delete/<id>/` | Delete a specific comment.              |
 
-## ERD Diagram
+## ERD Diagram -->
+
+
+Here's the updated system design document with prerequisites and instructions on how to run the Docker setup:
+
+---
+
+# System Design Document
+
+## Overview
+
+This document outlines the chosen microservices architecture, communication protocols, and data storage strategies for our scalable real-time notification system for a social media platform. The system is designed to handle user accounts, posts, and notifications with a focus on scalability, reliability, and real-time delivery.
+
+## Architecture
+
+### Microservices
+
+1. **User Service**: Manages user accounts and authentication.
+2. **Post Service**: Handles posts creation, updating, and retrieval.
+3. **Notification Service**: Manages notifications for user activities such as new posts, comments, and follows.
+
+### Communication Protocols
+
+- **REST API**: Used for synchronous communication between services.
+- **RabbitMQ**: Used for asynchronous communication to handle notifications and real-time updates.
+
+### Data Storage Strategies
+
+- **User Service**: Uses PostgreSQL for relational data storage.
+- **Post Service**: Uses PostgreSQL for relational data storage.
+- **Notification Service**: Uses Redis for fast access to notification data and PostgreSQL for persistent storage.
+
+## Prerequisites
+
+Before setting up the system, ensure that you have the following prerequisites installed:
+
+- Docker
+- Docker Compose
+- Git
+
+## Microservices Details
+
+### User Service
+
+- **Database**: PostgreSQL
+- **Endpoints**:
+  - `/users/` (GET, POST): Retrieve list of users, create a new user.
+  - `/users/{id}/` (GET, PUT, DELETE): Retrieve, update, delete a user.
+
+### Post Service
+
+- **Database**: PostgreSQL
+- **Endpoints**:
+  - `/posts/` (GET, POST): Retrieve list of posts, create a new post.
+  - `/posts/{id}/` (GET, PUT, DELETE): Retrieve, update, delete a post.
+  - `/posts/{id}/comments/` (GET, POST): Retrieve list of comments for a post, add a comment.
+
+### Notification Service
+
+- **Database**: Redis (for fast access), PostgreSQL (for persistent storage)
+- **Endpoints**:
+  - `/notifications/` (GET): Retrieve list of notifications for a user.
+  - `/notifications/{id}/` (PUT): Mark a notification as read.
+
+## URL, Action Methods, and Descriptions
+
+| URL                         | Action Method | Description                                                |
+|-----------------------------|---------------|------------------------------------------------------------|
+| `/users/`                   | GET           | Retrieve a list of users                                   |
+| `/users/`                   | POST          | Create a new user                                          |
+| `/users/{id}/`              | GET           | Retrieve details of a specific user                        |
+| `/users/{id}/`              | PUT           | Update details of a specific user                          |
+| `/users/{id}/`              | DELETE        | Delete a specific user                                     |
+| `/posts/`                   | GET           | Retrieve a list of posts                                   |
+| `/posts/`                   | POST          | Create a new post                                          |
+| `/posts/{id}/`              | GET           | Retrieve details of a specific post                        |
+| `/posts/{id}/`              | PUT           | Update a specific post                                     |
+| `/posts/{id}/`              | DELETE        | Delete a specific post                                     |
+| `/posts/{id}/comments/`     | GET           | Retrieve a list of comments for a specific post            |
+| `/posts/{id}/comments/`     | POST          | Add a comment to a specific post                           |
+| `/notifications/`           | GET           | Retrieve a list of notifications for the authenticated user|
+| `/notifications/{id}/`      | PUT           | Mark a notification as read                                |
+
+## Communication Flow
+
+1. **User Registration**:
+   - The client sends a POST request to the User Service (`/users/`).
+   - The User Service creates a new user and returns the user details.
+
+2. **Post Creation**:
+   - The client sends a POST request to the Post Service (`/posts/`).
+   - The Post Service creates a new post and publishes an event to RabbitMQ.
+   - The Notification Service consumes the event and creates notifications for followers of the user who created the post.
+
+3. **Retrieve Notifications**:
+   - The client sends a GET request to the Notification Service (`/notifications/`).
+   - The Notification Service retrieves the notifications from Redis and returns them to the client.
+
+## Data Models
+
+### User Model
+
+```python
+class User(models.Model):
+    username = models.CharField(max_length=150, unique=True)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128)
+    first_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=30, blank=True)
+    date_joined = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+```
+
+### Post Model
+
+```python
+class Post(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+```
+
+### Notification Model
+
+```python
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True)
+    message = models.CharField(max_length=255)
+    read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+```
+
+## Running the Docker Setup
+
+### Step 1: Clone the Repository
+
+```sh
+git clone https://github.com/yourusername/yourrepository.git
+cd yourrepository
+```
+
+### Step 2: Build and Run the Docker Containers
+
+```sh
+docker-compose up --build
+```
+
+This command will build the Docker images and start the containers defined in your `docker-compose.yml` file.
+
+### Step 3: Apply Database Migrations
+
+```sh
+docker-compose exec user_service python manage.py migrate
+docker-compose exec post_service python manage.py migrate
+docker-compose exec notification_service python manage.py migrate
+```
+
+### Step 4: Create a Superuser for Django Admin
+
+```sh
+docker-compose exec user_service python manage.py createsuperuser
+```
+
+Follow the prompts to create a superuser account.
+
+### Step 5: Access the Application
+
+- **User Service**: `http://localhost:8000`
+- **Post Service**: `http://localhost:8001`
+- **Notification Service**: `http://localhost:8002`
+
+### Step 6: Run Tests (Optional)
+
+```sh
+docker-compose exec user_service python manage.py test
+docker-compose exec post_service python manage.py test
+docker-compose exec notification_service python manage.py test
+```
