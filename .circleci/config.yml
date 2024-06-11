@@ -19,14 +19,12 @@ jobs:
       # Build Docker image
       - run:
           name: Build Docker image
-          command: docker-compose build up --build
+          command: docker-compose  up --build
 
       # Run tests
       - run:
-          name: Run tests
+          name: Run tests in image
           command: docker-compose run test
-
-
 workflows:
   version: 2
   build_and_test:
