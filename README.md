@@ -69,14 +69,17 @@ To improve performance and scalability, caching mechanisms are used to reduce da
    ```
 
 ### Running the Application
-1.  **Build and run your Docker**:
+1.  **Update .env file**:
+   - Update the .env file(Note that this file is not meant to be uploaded. This is for testing purposes) 
+
+2.  **Build and run your Docker**:
    - Used to start up all the services defined in a Docker Compose file, while also building or rebuilding the service images if necessary.
    ```bash
    docker-compose up --build
    ```
 
 
-2. **Run the tests**:
+3. **Run the tests**:
    ```bash
    docker-compose run tests
    ```
