@@ -18,6 +18,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 # settings.py
 import sentry_sdk
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY="django-insecure-xi@@*gceecx#9^^311qpn6#l-e=ydu!5#9uxjrna5=7fw*ch^^"
+SECRET_KEY = "django-insecure-xi@@*gceecx#9^^311qpn6#l-e=ydu!5#9uxjrna5=7fw*ch^^"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -34,7 +35,13 @@ DEBUG = True
 ROOT_URLCONF = "social_media_project.urls"
 
 
-ALLOWED_HOSTS = ["52.90.160.169", "54.145.62.70","127.0.0.1", "localhost", '54.227.101.229']
+ALLOWED_HOSTS = [
+    "52.90.160.169",
+    "54.145.62.70",
+    "127.0.0.1",
+    "localhost",
+    "54.227.101.229",
+]
 
 
 # Application definition
@@ -48,8 +55,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
-    'drf_yasg',
-    'corsheaders',
+    "drf_yasg",
+    "corsheaders",
     "social_media_project.apps.user_service",
     "social_media_project.apps.post_service",
     "social_media_project.apps.notification_service",
@@ -59,7 +66,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -91,13 +98,13 @@ WSGI_APPLICATION = "social_media_project.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'social_media_project',
-        'USER': 'salmanyagaka',
-        'PASSWORD': 'salma',  # Use the same password you set in docker-compose.yml
-        'HOST': 'db',  # Use the service name defined in docker-compose.yml
-        'PORT': '5432',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "social_media_project",
+        "USER": "salmanyagaka",
+        "PASSWORD": "salma",  # Use the same password you set in docker-compose.yml
+        "HOST": "localhost",  # Use the service name defined in docker-compose.yml
+        "PORT": "5432",
     }
 }
 
@@ -178,13 +185,13 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', '')
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "")
 
 
 # settings.py
-CELERY_BROKER_URL = 'amqp://salmanyagaka:salma@rabbitmq:5672//'
+CELERY_BROKER_URL = "amqp://localhost"
 CELERY_RESULT_BACKEND = "rpc://"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
@@ -195,26 +202,25 @@ CELERY_TIMEZONE = "UTC"
 DOMAIN_NAME = os.getenv("DOMAIN_NAME", "")
 
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
 # CACHES = {
 #     'default': {
 #         'BACKEND': 'django_redis.cache.RedisCache',
-#         'LOCATION': 'redis://127.0.0.1:6379/1',
+#         'LOCATION': 'redis://redis:6379/1',
 #         'OPTIONS': {
 #             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
 #         }
 #     }
 # }
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://redis:6379/1',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-        }
-    }
-}
-
 
 
 sentry_sdk.init(

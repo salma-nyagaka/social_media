@@ -39,7 +39,7 @@ class TestCommentAPI:
         """
         url = reverse("list_comments")
         response = self.client.get(url)
-        
+
         assert response.status_code == status.HTTP_200_OK
         assert "data" in response.data
         assert response.data["message"] == "Comments retrieved successfully"
@@ -54,7 +54,7 @@ class TestCommentAPI:
             "content": "New comment",
         }
         response = self.client.post(url, data, format="json")
-        
+
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["message"] == "Comment created successfully"
 
@@ -68,7 +68,7 @@ class TestCommentAPI:
             "content": "",
         }
         response = self.client.post(url, data, format="json")
-        
+
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_retrieve_comment(self):
@@ -77,7 +77,7 @@ class TestCommentAPI:
         """
         url = reverse("retrieve_comment", kwargs={"pk": self.comment.pk})
         response = self.client.get(url)
-        
+
         assert response.status_code == status.HTTP_200_OK
         assert response.data["data"]["content"] == self.comment.content
 
@@ -87,20 +87,20 @@ class TestCommentAPI:
         """
         url = reverse("retrieve_comment", kwargs={"pk": 999})
         response = self.client.get(url)
-        
+
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_update_comment(self):
         """
         Test updating an existing comment.
         """
-        url = reverse("update_comment", kwargs={"pk": self.comment.pk})
+        url = reverse("update_comment", kwargs={"comment_id": self.comment.pk})
         data = {
             "post": self.post.id,
             "content": "Updated comment",
         }
         response = self.client.put(url, data, format="json")
-        
+
         assert response.status_code == status.HTTP_200_OK
         assert response.data["message"] == "Comment updated successfully"
 
@@ -108,42 +108,42 @@ class TestCommentAPI:
         """
         Test updating a non-existent comment.
         """
-        url = reverse("update_comment", kwargs={"pk": 999})
+        url = reverse("update_comment", kwargs={"comment_id": 999})
         data = {
             "content": "Updated comment",
         }
         response = self.client.put(url, data, format="json")
-        
+
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_update_comment_no_content(self):
         """
         Test updating a comment with no content.
         """
-        url = reverse("update_comment", kwargs={"pk": self.comment.pk})
+        url = reverse("update_comment", kwargs={"comment_id": self.comment.pk})
         data = {
             "content": "",
         }
         response = self.client.put(url, data, format="json")
-        
+
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_delete_comment(self):
         """
         Test deleting an existing comment.
         """
-        url = reverse("delete_comment", kwargs={"pk": self.comment.pk})
+        url = reverse("delete_comment", kwargs={"comment_id": self.comment.pk})
         response = self.client.delete(url)
-        
+
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_delete_comment_not_exist(self):
         """
         Test deleting a non-existent comment.
         """
-        url = reverse("delete_comment", kwargs={"pk": 999})
+        url = reverse("delete_comment", kwargs={"comment_id": 999})
         response = self.client.delete(url)
-        
+
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @patch(
@@ -160,7 +160,7 @@ class TestCommentAPI:
             "content": "New comment",
         }
         response = self.client.post(url, data, format="json")
-        
+
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["message"] == "Something went wrong"
         assert "detail" in response.data["errors"]

@@ -21,13 +21,13 @@ delete_comment = CommentViewSet.as_view({"delete": "destroy"})
 
 urlpatterns = [
     path("", create_post, name="create_post"),
-    path("<int:pk>/", retrieve, name="retrieve"),
+    path("<int:post_id>/", retrieve, name="retrieve"),
     path("all/", retrieve_all, name="retrieve_all"),
     path("delete/<int:pk>/", delete_post, name="delete_post"),
     path("update/<int:pk>/", update_post, name="update_post"),
     path("comments/", create_comment, name="create_comment"),
     path("comments/all/", list_comments, name="list_comments"),
     path("comments/<int:pk>/", retrieve_comment, name="retrieve_comment"),
-    path("comments/update/<int:pk>/", update_comment, name="update_comment"),
-    path("comments/delete/<int:pk>/", delete_comment, name="delete_comment"),
+    path("comments/update/<int:comment_id>/", update_comment, name="update_comment"),
+    path("comments/delete/<int:comment_id>/", delete_comment, name="delete_comment"),
 ]

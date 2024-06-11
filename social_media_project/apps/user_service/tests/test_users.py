@@ -11,8 +11,8 @@ from social_media_project.apps.user_service.views import UserViewSet
 from social_media_project.apps.user_service.serializers import (
     UserCreateSerializer,
     UserUpdateSerializer,
+    UserSerializer,
 )
-
 @pytest.mark.django_db
 class TestUserAPI:
     """
@@ -34,6 +34,12 @@ class TestUserAPI:
             last_name="test2",
             is_active=True,
         )
+        self.user2 = User.objects.create_user(
+            username="testuser2",
+            password="testpass2",
+            email="testuser2@example.com",
+            is_active=True,
+        )
         self.client.force_authenticate(user=self.user)
         self.user_url = reverse("retrieve_user", kwargs={"pk": self.user.pk})
         self.login_url = reverse("user_login")
@@ -52,7 +58,7 @@ class TestUserAPI:
             "last_name": "test2",
         }
         response = self.client.post(url, data, format="json")
-        
+
         assert response.status_code == 201
         assert (
             response.data["message"]
@@ -65,7 +71,7 @@ class TestUserAPI:
         """
         url = reverse("list_users")
         response = self.client.get(url)
-        
+
         assert response.status_code == 200
         assert "data" in response.data
         assert len(response.data["data"]) > 0
@@ -75,7 +81,7 @@ class TestUserAPI:
         Test retrieving a user's details.
         """
         response = self.client.get(self.user_url)
-        
+
         assert response.status_code == 200
         assert response.data["data"]["username"] == self.user.username
 
@@ -85,7 +91,7 @@ class TestUserAPI:
         """
         url = reverse("retrieve_user", args=[999])
         response = self.client.get(url, format="json")
-        
+
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.data["message"] == "Something went wrong"
         assert response.data["error"] == "The user does not exist"
@@ -97,9 +103,10 @@ class TestUserAPI:
         url = reverse("update_user", kwargs={"pk": self.user.pk})
         data = {"email": "updatedemail@example.com"}
         response = self.client.patch(url, data, format="json")
-        
+
         assert response.status_code == 200
         assert response.data["data"]["email"] == "updatedemail@example.com"
+
 
     def test_nonexistant_update_user(self):
         """
@@ -109,7 +116,7 @@ class TestUserAPI:
         url = reverse("update_user", kwargs={"pk": non_existent_pk})
         data = {"email": "updatedemail@example.com"}
         response = self.client.patch(url, data, format="json")
-        
+
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.data["message"] == "Something went wrong"
         assert response.data["error"] == "User does not exist"
@@ -120,8 +127,18 @@ class TestUserAPI:
         """
         url = reverse("delete_user", kwargs={"pk": self.user.pk})
         response = self.client.delete(url)
-        
+
         assert response.status_code == 204
+        
+    def test_user_cannot_delete_other_profile(self):
+        """
+        Ensure a user cannot delete another user's profile.
+        """
+        url = reverse("delete_user", args=[self.user2.pk])
+        response = self.client.delete(url)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.data == {"message": "You do not have permission to delete this profile."}
 
     def test_delete_user_not_exist(self):
         """
@@ -130,7 +147,7 @@ class TestUserAPI:
         non_existent_pk = 999
         url = reverse("delete_user", kwargs={"pk": non_existent_pk})
         response = self.client.delete(url)
-        
+
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.data["message"] == "Something went wrong"
         assert response.data["error"] == "The user does not exist"
@@ -141,7 +158,7 @@ class TestUserAPI:
         """
         data = {"username": "testuser", "password": "testpass"}
         response = self.client.post(self.login_url, data, format="json")
-        
+
         assert response.status_code == 200
         assert "token" in response.data["data"]
 
@@ -151,7 +168,7 @@ class TestUserAPI:
         """
         data = {"username": "testuser", "password": "wrongpass"}
         response = self.client.post(self.login_url, data, format="json")
-        
+
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_current_user(self):
@@ -160,7 +177,7 @@ class TestUserAPI:
         """
         url = reverse("get_current_user")
         response = self.client.get(url)
-        
+
         assert response.status_code == status.HTTP_200_OK
 
     @patch("jwt.decode")
@@ -174,9 +191,68 @@ class TestUserAPI:
         }
         token = "fake-jwt-token"
         url = reverse("activate_account", args=[token])
-        
+
         response = self.client.get(url)
-        
+
         assert response.status_code == status.HTTP_200_OK
         self.user.refresh_from_db()
         assert self.user.is_active
+        
+    def test_get_serializer_class_create(self):
+        """
+        Test get_serializer_class method for the 'create' action.
+        """
+        view = UserViewSet()
+        view.action = "create"
+        view.request = self.factory.post(reverse("create_user"))
+        serializer_class = view.get_serializer_class()
+
+        assert serializer_class == UserCreateSerializer
+
+    def test_get_serializer_class_update(self):
+        """
+        Test get_serializer_class method for the 'update' action.
+        """
+        view = UserViewSet()
+        view.action = "update"
+        view.request = self.factory.put(reverse("update_user", args=[self.user.pk]))
+        serializer_class = view.get_serializer_class()
+
+        assert serializer_class == UserUpdateSerializer
+
+
+    def test_get_serializer_class_partial_update(self):
+        """
+        Test get_serializer_class method for the 'partial_update' action.
+        """
+        view = UserViewSet()
+        view.action = "partial_update"
+        view.request = self.factory.patch(reverse("update_user", args=[self.user.pk]))
+        serializer_class = view.get_serializer_class()
+
+        assert serializer_class == UserUpdateSerializer
+
+    def test_get_serializer_class_default(self):
+        """
+        Test get_serializer_class method for the default action.
+        """
+        view = UserViewSet()
+        view.action = "list"
+        view.request = self.factory.get(reverse("list_users"))
+        serializer_class = view.get_serializer_class()
+
+        assert serializer_class == UserSerializer
+
+
+    def test_user_cannot_edit_other_profile(self):
+        """
+        Ensure a user cannot edit another user's profile.
+        """
+        url = reverse("update_user", args=[self.user2.pk])
+        response = self.client.patch(url, {
+            "username": "newusername",
+            "email": "newemail@example.com",
+        })
+        
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.data == {"message": "You do not have permission to edit this profile."}

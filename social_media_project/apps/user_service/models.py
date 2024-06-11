@@ -9,7 +9,6 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=150, blank=False, null=False)
 
 
-
 class UserFollowing(models.Model):
     user_id = models.ForeignKey(
         User, related_name="following", on_delete=models.CASCADE

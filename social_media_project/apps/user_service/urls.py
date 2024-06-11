@@ -20,10 +20,10 @@ urlpatterns = [
     path("login/", UserLoginAPIView.as_view(), name="user_login"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("update/<int:pk>/", update_user, name="update_user"),
+    path("users/my_profile/", get_current_user, name="get_current_user"),
     path("all/", list_users, name="list_users"),
     path("<int:pk>/", retrieve_user, name="retrieve_user"),
     path("delete/<int:pk>/", delete_user, name="delete_user"),
-    path("users/my_profile/", get_current_user, name="get_current_user"),
     path(
         "email_confirmation/<str:token>/",
         ActivateAccountAPIView.as_view(),
@@ -32,5 +32,5 @@ urlpatterns = [
     path("get_current_user/", get_current_user, name="get_current_user"),
     path("follow/<int:pk>/", follow, name="follow"),
     path("unfollow/<int:pk>/", unfollow, name="unfollow"),
-    path("followers/<int:pk>/", followers, name="followers"),
+    path("followers", followers, name="followers"),
 ]
