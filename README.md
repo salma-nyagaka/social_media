@@ -51,7 +51,7 @@ The data is stored in a PostgreSQL database. Each microservice has its own datab
 - **Post Service**: Stores posts and comments.
 - **Notification Service**: Stores notification history and user preferences.
 
-To improve performance and scalability, caching mechanisms are used to reduce database load.
+To improve performance and scalability, caching mechanisms via the Redis server are used to reduce database load.
 
 ## Project Setup
 
