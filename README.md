@@ -5,6 +5,7 @@
 1. [Introduction](#introduction)
 2. [System Design](#system-design)
    - [Microservices Architecture](#microservices-architecture)
+   - [Authentication](#authentication)
    - [Communication Protocols](#communication-protocols)
    - [Data Storage Strategies](#data-storage-strategies)
 3. [Project Setup](#project-setup)
@@ -34,6 +35,14 @@ The system is designed as a collection of independent microservices that communi
 3. **Notification Service**: Generates and delivers real-time notifications to users.
 
 Each microservice is responsible for a specific aspect of the application and operates independently. This design allows for easier scaling and maintenance.
+
+### Authentication
+
+To secure our endpoints and manage authentication, we  have used JSON Web Tokens (JWT). After logging in, pass the token as follows. You can also include it in your environemnt settings
+```bash 
+Bearer {{token}}
+```
+
 
 ### Communication Protocols
 
@@ -108,12 +117,14 @@ To monitor and debug issues in your application, you can integrate Sentry, an er
 
    
 ## API Endpoints
+**_Create an environment with a `base_url` and a token (generated upon login) that will be accessible by our endpoints._**
+
 ### User Service API Endpoints
 
 | Method | Endpoint                          | Description                             |
 |--------|-----------------------------------|-----------------------------------------|
 | POST   | `{{base_url}}/users/create_user/` | Create a new user.                      |
-| POST   | `{{base_url}}/users/login/`       | User login.                             |
+| POST   | `{{base_url}}/users/login/`       | User login to generate a token                             |
 | GET    | `{{base_url}}/users/get_current_user/` | Get the current authenticated user.     |
 | PATCH  | `{{base_url}}/users/update/<id>/` | Update profile                 |
 | GET    | `{{base_url}}/users/all`          | List all active users.                  |
