@@ -20,6 +20,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install psycopg2-binary gunicorn
 
+# Copy the wait-for-it script into the container
+COPY wait-for-it.sh /wait-for-it.sh
+
+# Make the wait-for-it script executable
+RUN chmod +x /wait-for-it.sh
+
 # Verify Gunicorn installation
 RUN gunicorn --version
 
@@ -27,4 +33,5 @@ RUN gunicorn --version
 COPY . .
 
 # Command to run your application
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "social_media_project.wsgi:application"]
+# CMD ["gunicorn", "--bind", "0.0.0.0:8000", "social_media_project.wsgi:application"]
+CMD ["/wait-for-it.sh", "db:5432", "--", "sh", "-c", "python manage.py makemigrations && python manage.py migrate && gunicorn --bind 0.0.0.0:8000 social_media_project.wsgi:application"]
