@@ -1,3 +1,19 @@
+sudo apt-get remove -y docker docker-engine docker.io containerd runc
+
+# Clean up unnecessary files to free up space
+sudo apt-get clean
+sudo rm -rf /var/lib/apt/lists/*
+sudo rm -rf /var/log/*
+sudo rm -rf /tmp/*
+sudo rm -rf /var/tmp/*
+
+# Remove all Docker containers, images, volumes, and networks
+docker stop $(docker ps -aq) || true
+docker rm $(docker ps -aq) || true
+docker rmi -f $(docker images -aq) || true
+docker volume rm $(docker volume ls -q) || true
+docker network rm $(docker network ls | grep -v 'bridge\|host\|none' | awk '{print $1}') || true
+docker system prune -a --volumes --force || true
 
 # Install dependencies
 sudo apt-get update
