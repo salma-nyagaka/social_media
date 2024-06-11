@@ -22,7 +22,7 @@ jobs:
         uses: codecov/codecov-action@v4.0.1
         # uses: codecov/codecov-action@v3
         with:
-          token: ````
+          token: 5dcfad2a-05bd-4c34-8096-f5a1c7292ffd
           files: ./coverage.xml
           flags: unittests
           name: codecov-umbrella
