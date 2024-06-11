@@ -5,11 +5,10 @@ services:
     image: postgres:16
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: social_media_project
-      POSTGRES_USER: salmanyagaka
-      POSTGRES_PASSWORD: 'salma'
-
+   
+    env_file:
+      - .env
+      
   redis:
     image: redis:6
 
