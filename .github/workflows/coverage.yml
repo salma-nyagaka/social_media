@@ -22,10 +22,7 @@ jobs:
         run: |
           pytest
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
         with:
-          token: c4daa84b-a63f-454c-86c7-a57a0ad7bcb4
-          file: ./coverage.xml
-          flags: unittests
-          name: codecov-umbrella
+          token: ${{ secrets.CODECOV_TOKEN }}
