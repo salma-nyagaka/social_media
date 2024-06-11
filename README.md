@@ -59,6 +59,7 @@ To improve performance and scalability, caching mechanisms are used to reduce da
 - PostgreSQL 16
 - RabbitMQ
 - Celery
+- Sentry account
 
 ### Installation
 
@@ -84,6 +85,19 @@ To improve performance and scalability, caching mechanisms are used to reduce da
    docker-compose run tests
    ```
 
+## Sentry Configuration
+
+To monitor and debug issues in your application, you can integrate Sentry, an error tracking service. Here’s how you can set up Sentry in your Django application:
+
+1. **Update settings.py**:
+   - Update the the Sentry DSN in the settings file:
+
+
+2. **Verify Sentry Integration**:
+   - You can test if Sentry is correctly set up by triggering an error in your application and checking if it appears in your Sentry dashboard.
+
+   - You should have something like this incase of an error
+   
 ## API Endpoints
 ### User Service API Endpoints
 
