@@ -98,7 +98,7 @@ class UserViewSet(viewsets.ViewSet):
             "data": serializer.data,
         }
 
-        cache.set(cache_key, serializer.data, timeout=60 * 15)
+        cache.set(cache_key, context, timeout=60 * 15)
         return Response(context, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
@@ -131,6 +131,7 @@ class UserViewSet(viewsets.ViewSet):
             "message": "You have successfully fetched user data",
             "data": serializer.data,
         }
+        cache.delete("users_list")
         cache.set(cache_key, context, timeout=60 * 15)  # Cache for 15 minutes
         return Response(context, status=status.HTTP_200_OK)
 
