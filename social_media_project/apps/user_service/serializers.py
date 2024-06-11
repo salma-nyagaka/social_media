@@ -120,7 +120,6 @@ class UserLoginAPIViewSerializer(serializers.Serializer):
                 }
             )
 
-
         user = authenticate(
             request=self.context.get("request"), username=username, password=password
         )

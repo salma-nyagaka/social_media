@@ -13,13 +13,27 @@ from social_media_project.apps.user_service.models import User
 
 import math
 
-BATCH_SIZE = 100 
+BATCH_SIZE = 100
 
 
 @shared_task
 def send_batch_notifications(
     subject, message, recipient_list, context, html_template, notification_type
 ):
+    """
+    Send batch notifications to users via email.
+
+    Args:
+        subject (str): The subject of the email.
+        message (str): The message content of the email.
+        recipient_list (list): List of recipient email addresses.
+        context (dict): Context data for rendering the HTML template.
+        html_template (str): The path to the HTML template for the email.
+        notification_type (str): The type of notification being sent.
+
+    Returns:
+        str: A message indicating the number of notifications sent.
+    """
     user_emails = recipient_list
     total_users = len(user_emails)
     num_batches = math.ceil(total_users / BATCH_SIZE)
@@ -63,6 +77,18 @@ def send_batch_notifications(
 
 
 def send_bulk_emails(email_messages):
+    """
+    Send bulk emails using a single connection.
+
+    Args:
+        email_messages (list): A list of email message tuples, each containing:
+            - subject (str): The subject of the email.
+            - text_content (str): The plain text content of the email.
+            - from_email (str): The sender email address.
+            - recipient_list (list): List of recipient email addresses.
+            - html_content (str): The HTML content of the email.
+
+    """
     connection = get_connection()
     emails = []
     for (

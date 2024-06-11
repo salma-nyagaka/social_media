@@ -38,7 +38,7 @@ class TestBlogPostAPI:
         """
         url = reverse("retrieve_all")
         response = self.client.get(url)
-        
+
         assert response.status_code == status.HTTP_200_OK
         assert "data" in response.data
         assert response.data["message"] == "Post retrieved successfully"
@@ -53,7 +53,7 @@ class TestBlogPostAPI:
             "content": "New content",
         }
         response = self.client.post(url, data, format="json")
-        
+
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["message"] == "Post created successfully"
 
@@ -67,16 +67,16 @@ class TestBlogPostAPI:
             "content": "",
         }
         response = self.client.post(url, data, format="json")
-        
+
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_retrieve_post(self):
         """
         Test retrieving a single post.
         """
-        url = reverse("retrieve", kwargs={"pk": self.post.pk})
+        url = reverse("retrieve", kwargs={"post_id": self.post.pk})
         response = self.client.get(url)
-        
+
         assert response.status_code == status.HTTP_200_OK
         assert response.data["data"]["title"] == self.post.title
 
@@ -84,9 +84,9 @@ class TestBlogPostAPI:
         """
         Test retrieving a non-existent post.
         """
-        url = reverse("retrieve", kwargs={"pk": 999})
+        url = reverse("retrieve", kwargs={"post_id": 999})
         response = self.client.get(url)
-        
+
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.data["message"] == "Something went wrong"
         assert "errors" in response.data
@@ -101,7 +101,7 @@ class TestBlogPostAPI:
             "content": "Updated content",
         }
         response = self.client.put(url, data, format="json")
-        
+
         assert response.status_code == status.HTTP_200_OK
         assert response.data["message"] == "Post updated successfully"
 
@@ -115,7 +115,7 @@ class TestBlogPostAPI:
             "content": "Updated content",
         }
         response = self.client.put(url, data, format="json")
-        
+
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.data["message"] == "Something went wrong"
         assert "errors" in response.data
@@ -126,7 +126,7 @@ class TestBlogPostAPI:
         """
         url = reverse("delete_post", kwargs={"pk": self.post.pk})
         response = self.client.delete(url)
-        
+
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_delete_post_not_exist(self):
@@ -135,22 +135,22 @@ class TestBlogPostAPI:
         """
         url = reverse("delete_post", kwargs={"pk": 999})
         response = self.client.delete(url)
-        
+
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.data["message"] == "Something went wrong"
         assert "errors" in response.data
-        
+
     def test_update_post_invalid_data(self):
         """
         Test updating a post with invalid data to trigger the else statement.
         """
         url = reverse("update_post", kwargs={"pk": self.post.pk})
         data = {
-            "title": "",  
+            "title": "",
             "content": "Updated content",
         }
         response = self.client.put(url, data, format="json")
-        
+
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["message"] == "Something went wrong"
         assert "errors" in response.data

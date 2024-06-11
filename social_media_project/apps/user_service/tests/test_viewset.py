@@ -10,6 +10,7 @@ from social_media_project.apps.user_service.serializers import (
 from social_media_project.apps.user_service.models import User
 from rest_framework import status
 
+
 @pytest.mark.django_db
 class TestUserViewSet(APITestCase):
     """
@@ -39,7 +40,7 @@ class TestUserViewSet(APITestCase):
         view.action = "create"
         view.request = self.factory.post(reverse("create_user"))
         serializer_class = view.get_serializer_class()
-        
+
         assert serializer_class == UserCreateSerializer
 
     def test_get_serializer_class_update(self):
@@ -50,7 +51,7 @@ class TestUserViewSet(APITestCase):
         view.action = "update"
         view.request = self.factory.put(reverse("update_user", args=[self.user.pk]))
         serializer_class = view.get_serializer_class()
-        
+
         assert serializer_class == UserUpdateSerializer
 
     def test_get_serializer_class_partial_update(self):
@@ -61,7 +62,7 @@ class TestUserViewSet(APITestCase):
         view.action = "partial_update"
         view.request = self.factory.patch(reverse("update_user", args=[self.user.pk]))
         serializer_class = view.get_serializer_class()
-        
+
         assert serializer_class == UserUpdateSerializer
 
     def test_get_serializer_class_default(self):
@@ -72,5 +73,5 @@ class TestUserViewSet(APITestCase):
         view.action = "list"
         view.request = self.factory.get(reverse("list_users"))
         serializer_class = view.get_serializer_class()
-        
+
         assert serializer_class == UserSerializer

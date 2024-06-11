@@ -30,6 +30,10 @@ class UserViewSet(viewsets.ViewSet):
     queryset = User.objects.all()
 
     def get_permissions(self):
+        """
+        Returns:
+            list: The list of permission classes.
+        """
         if self.action == "create":
             self.permission_classes = [AllowAny]
         else:
@@ -37,6 +41,13 @@ class UserViewSet(viewsets.ViewSet):
         return super().get_permissions()
 
     def get_serializer_class(self):
+        """
+        Override this method to set serializer classes based on the action.
+
+        Returns:
+            Serializer class: The appropriate serializer class.
+        """
+
         if self.action == "create":
             return UserCreateSerializer
         elif self.action in ["update", "partial_update"]:
@@ -44,10 +55,20 @@ class UserViewSet(viewsets.ViewSet):
         return UserSerializer
 
     def create(self, request):
+        """
+        Create a new user account.
+
+        Args:
+            request: The HTTP request containing the user data.
+
+        Returns:
+            Response: A response indicating the success or failure of the user creation.
+        """
+
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            cache.delete("users_list") 
+            cache.delete("users_list")
             context = {
                 "message": "Your account has been successfully created. Please activate your account by clicking the link sent to your email.",
                 "data": serializer.data,
@@ -57,23 +78,43 @@ class UserViewSet(viewsets.ViewSet):
         return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
     def list(self, request):
+        """
+        List all active users.
+
+        Args:
+            request: The HTTP request.
+
+        Returns:
+            Response: A response containing the list of active users.
+        """
         cache_key = "users_list"
         cached_users = cache.get(cache_key)
         if cached_users is not None:
             return Response(cached_users, status=status.HTTP_200_OK)
-        
+
         queryset = User.objects.filter(is_active=True)  # Filter for active users
         serializer = UserSerializer(queryset, many=True)
         context = {
             "message": "You have successfully fetched all active users",
             "data": serializer.data,
         }
-  
-        cache.set(cache_key, serializer.data, timeout=60*15)
+
+        cache.set(cache_key, serializer.data, timeout=60 * 15)
         return Response(context, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
-        cache_key = f"user_{pk}"
+        """
+        Retrieve a user by their ID.
+
+        Args:
+            request: The HTTP request.
+            pk: The ID of the user to retrieve.
+
+        Returns:
+            Response: A response containing the user data or an error message.
+        """
+
+        cache_key = f"user_detail_{pk}"
         cached_user = cache.get(cache_key)
         if cached_user is not None:
             return Response(cached_user, status=status.HTTP_200_OK)
@@ -91,23 +132,33 @@ class UserViewSet(viewsets.ViewSet):
             "message": "You have successfully fetched user data",
             "data": serializer.data,
         }
-        cache.set(cache_key, context, timeout=60*15)  # Cache for 15 minutes
+        cache.set(cache_key, context, timeout=60 * 15)  # Cache for 15 minutes
         return Response(context, status=status.HTTP_200_OK)
 
     def update_user(self, request, pk=None):
+        """
+        Update a user by their ID.
+
+        Args:
+            request: The HTTP request containing the updated user data.
+            pk: The ID of the user to update.
+
+        Returns:
+            Response: A response indicating the success or failure of the user update.
+        """
         try:
             user = User.objects.get(pk=pk)
             serializer = UserUpdateSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 # Invalidate cache
-                cache.delete(f"user_{pk}") 
-                cache.delete("users_list") 
+                cache.delete(f"user_update_{pk}")
+                cache.delete("users_list")
                 context = {
                     "message": "You have successfully updated user data",
                     "data": serializer.data,
                 }
-                cache.set(f"user_{pk}", context, timeout=60*15)
+                cache.set(f"user_update_{pk}", context, timeout=60 * 15)
                 return Response(context, status=status.HTTP_200_OK)
             context = {"message": "Something went wrong", "error": serializer.errors}
             return Response(context, status=status.HTTP_400_BAD_REQUEST)
@@ -119,6 +170,16 @@ class UserViewSet(viewsets.ViewSet):
             return Response(context, status=status.HTTP_404_NOT_FOUND)
 
     def destroy(self, request, pk=None):
+        """
+        Delete a user by their ID.
+
+        Args:
+            request: The HTTP request.
+            pk: The ID of the user to delete.
+
+        Returns:
+            Response: A response indicating the success or failure of the user deletion.
+        """
         try:
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
@@ -129,12 +190,21 @@ class UserViewSet(viewsets.ViewSet):
             return Response(context, status=status.HTTP_404_NOT_FOUND)
         user.delete()
         # Invalidate cache
-        cache.delete(f"user_{pk}") 
-        cache.delete("users_list") 
+        cache.delete(f"user_{pk}")
+        cache.delete("users_list")
         context = {"message": "You have successfully deleted the user data"}
         return Response(context, status=status.HTTP_204_NO_CONTENT)
 
     def get_current_user(self, request):
+        """
+        Get the current authenticated user's data.
+
+        Args:
+            request: The HTTP request.
+
+        Returns:
+            Response: A response containing the current user's data.
+        """
         serializer = UserSerializer(request.user)
         context = {
             "message": "You have successfully fetched user data",
@@ -143,8 +213,24 @@ class UserViewSet(viewsets.ViewSet):
         return Response(context, status=status.HTTP_200_OK)
 
     def follow(self, request, pk=None):
+        """
+        Follow another user.
+
+        Args:
+            request: The HTTP request.
+            pk: The ID of the user to follow.
+
+        Returns:
+            Response: A response indicating the success or failure of the follow action.
+        """
         user_to_follow = get_object_or_404(User, pk=pk)
         user = request.user
+ 
+        if user_to_follow.is_active == False:
+            return Response(
+                {"status": "You cannot follow this user. Account is inactive"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         if user == user_to_follow:
             return Response(
                 {"status": "You cannot follow yourself"},
@@ -183,6 +269,16 @@ class UserViewSet(viewsets.ViewSet):
             )
 
     def unfollow(self, request, pk=None):
+        """
+        Unfollow another user.
+
+        Args:
+            request: The HTTP request.
+            pk: The ID of the user to unfollow.
+
+        Returns:
+            Response: A response indicating the success or failure of the unfollow action.
+        """
         user_to_unfollow = get_object_or_404(User, pk=pk)
         user = request.user
         if user == user_to_unfollow:
@@ -215,17 +311,43 @@ class UserViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    def followers(self, request, pk=None):
-        user = get_object_or_404(User, pk=4)
+    def followers(self, request):
+        """
+        Get the list of followers of a user.
+
+        Args:
+            request: The HTTP request.
+            pk: The ID of the user whose followers to retrieve.
+
+        Returns:
+            Response: A response containing the list of followers.
+        """
+        user = get_object_or_404(User, pk=request.user.id)
         followers = User.objects.filter(following__following_user_id=user)
         serializer = UserSerializer(followers, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        context = {"message": "These are your followers", "data": serializer.data}
+        return Response(context, status=status.HTTP_200_OK)
 
 
 class UserLoginAPIView(APIView):
+    """
+    API view for user login.
+    """
+
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
+        """
+        Handle POST request for user login.
+
+        Args:
+            request: The HTTP request containing the login data.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            Response: A response indicating the success or failure of the login attempt.
+        """
         serializer = UserLoginAPIViewSerializer(
             data=request.data, context={"request": request}
         )
@@ -233,10 +355,8 @@ class UserLoginAPIView(APIView):
             if serializer.is_valid(raise_exception=True):
                 return Response(serializer.validated_data, status=status.HTTP_200_OK)
         except serializers.ValidationError as e:
-            # Extract the detail of the error
             error_detail = e.detail
             if isinstance(error_detail, list):
-                # If it's a list, it means there's a top-level error message
                 error_response = {
                     "message": "Something went wrong",
                     "errors": {"non_field_errors": error_detail},
@@ -250,9 +370,26 @@ class UserLoginAPIView(APIView):
 
 
 class ActivateAccountAPIView(APIView):
-    permission_classes = []  # Allow any
+    """
+    API view for activating a user account.
+    """
+
+    permission_classes = []
 
     def get(self, request, token, *args, **kwargs):
+        """
+        Handle GET request for account activation.
+
+        Args:
+            request: The HTTP request.
+            token: The activation token sent to the user's email.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            Response: A rendered HTML response indicating the success or failure of the account activation.
+        """
+
         try:
             decoded_token = jwt.decode(token, options={"verify_signature": False})
             user = User.objects.get(pk=decoded_token["user_id"])

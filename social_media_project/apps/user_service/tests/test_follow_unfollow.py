@@ -39,8 +39,13 @@ class TestFollowUnfollowAPI:
         url = reverse("follow", kwargs={"pk": self.user2.pk})
         response = self.client.post(url)
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["message"] == f"You have successfully followed {self.user2.username}"
-        assert UserFollowing.objects.filter(user_id=self.user1, following_user_id=self.user2).exists()
+        assert (
+            response.data["message"]
+            == f"You have successfully followed {self.user2.username}"
+        )
+        assert UserFollowing.objects.filter(
+            user_id=self.user1, following_user_id=self.user2
+        ).exists()
 
     def test_follow_user_yourself(self):
         """
@@ -69,8 +74,13 @@ class TestFollowUnfollowAPI:
         url = reverse("unfollow", kwargs={"pk": self.user2.pk})
         response = self.client.post(url)
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["message"] == f"You have successfully unfollowed {self.user2.username}"
-        assert not UserFollowing.objects.filter(user_id=self.user1, following_user_id=self.user2).exists()
+        assert (
+            response.data["message"]
+            == f"You have successfully unfollowed {self.user2.username}"
+        )
+        assert not UserFollowing.objects.filter(
+            user_id=self.user1, following_user_id=self.user2
+        ).exists()
 
     def test_unfollow_user_yourself(self):
         """
@@ -95,5 +105,5 @@ class TestFollowUnfollowAPI:
         Test listing all followers of a user.
         """
         UserFollowing.objects.create(user_id=self.user2, following_user_id=self.user1)
-        url = reverse("followers", kwargs={"pk": self.user1.pk})
+        url = reverse("followers")
         response = self.client.get(url)

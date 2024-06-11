@@ -13,6 +13,7 @@ from social_media_project.apps.user_service.serializers import (
     UserUpdateSerializer,
 )
 
+
 @pytest.mark.django_db
 class TestUserAPI:
     """
@@ -52,7 +53,7 @@ class TestUserAPI:
             "last_name": "test2",
         }
         response = self.client.post(url, data, format="json")
-        
+
         assert response.status_code == 201
         assert (
             response.data["message"]
@@ -65,7 +66,7 @@ class TestUserAPI:
         """
         url = reverse("list_users")
         response = self.client.get(url)
-        
+
         assert response.status_code == 200
         assert "data" in response.data
         assert len(response.data["data"]) > 0
@@ -75,7 +76,7 @@ class TestUserAPI:
         Test retrieving a user's details.
         """
         response = self.client.get(self.user_url)
-        
+
         assert response.status_code == 200
         assert response.data["data"]["username"] == self.user.username
 
@@ -85,7 +86,7 @@ class TestUserAPI:
         """
         url = reverse("retrieve_user", args=[999])
         response = self.client.get(url, format="json")
-        
+
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.data["message"] == "Something went wrong"
         assert response.data["error"] == "The user does not exist"
@@ -97,7 +98,7 @@ class TestUserAPI:
         url = reverse("update_user", kwargs={"pk": self.user.pk})
         data = {"email": "updatedemail@example.com"}
         response = self.client.patch(url, data, format="json")
-        
+
         assert response.status_code == 200
         assert response.data["data"]["email"] == "updatedemail@example.com"
 
@@ -109,7 +110,7 @@ class TestUserAPI:
         url = reverse("update_user", kwargs={"pk": non_existent_pk})
         data = {"email": "updatedemail@example.com"}
         response = self.client.patch(url, data, format="json")
-        
+
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.data["message"] == "Something went wrong"
         assert response.data["error"] == "User does not exist"
@@ -120,7 +121,7 @@ class TestUserAPI:
         """
         url = reverse("delete_user", kwargs={"pk": self.user.pk})
         response = self.client.delete(url)
-        
+
         assert response.status_code == 204
 
     def test_delete_user_not_exist(self):
@@ -130,7 +131,7 @@ class TestUserAPI:
         non_existent_pk = 999
         url = reverse("delete_user", kwargs={"pk": non_existent_pk})
         response = self.client.delete(url)
-        
+
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.data["message"] == "Something went wrong"
         assert response.data["error"] == "The user does not exist"
@@ -141,7 +142,7 @@ class TestUserAPI:
         """
         data = {"username": "testuser", "password": "testpass"}
         response = self.client.post(self.login_url, data, format="json")
-        
+
         assert response.status_code == 200
         assert "token" in response.data["data"]
 
@@ -151,7 +152,7 @@ class TestUserAPI:
         """
         data = {"username": "testuser", "password": "wrongpass"}
         response = self.client.post(self.login_url, data, format="json")
-        
+
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_current_user(self):
@@ -160,7 +161,7 @@ class TestUserAPI:
         """
         url = reverse("get_current_user")
         response = self.client.get(url)
-        
+
         assert response.status_code == status.HTTP_200_OK
 
     @patch("jwt.decode")
@@ -174,9 +175,9 @@ class TestUserAPI:
         }
         token = "fake-jwt-token"
         url = reverse("activate_account", args=[token])
-        
+
         response = self.client.get(url)
-        
+
         assert response.status_code == status.HTTP_200_OK
         self.user.refresh_from_db()
         assert self.user.is_active
