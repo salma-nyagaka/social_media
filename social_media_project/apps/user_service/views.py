@@ -148,6 +148,10 @@ class UserViewSet(viewsets.ViewSet):
         """
         try:
             user = User.objects.get(pk=pk)
+            if user.id != request.user.id:
+                error_response = {"message": "You do not have permission to edit this profile."}
+                return Response(error_response, status=status.HTTP_403_FORBIDDEN)
+        
             serializer = UserUpdateSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -182,6 +186,10 @@ class UserViewSet(viewsets.ViewSet):
         """
         try:
             user = User.objects.get(pk=pk)
+            if user.id != request.user.id:
+                error_response = {"message": "You do not have permission to delete this profile."}
+                return Response(error_response, status=status.HTTP_403_FORBIDDEN)
+        
         except User.DoesNotExist:
             context = {
                 "message": "Something went wrong",

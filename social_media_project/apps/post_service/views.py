@@ -91,6 +91,11 @@ class BlogPostViewSet(viewsets.ViewSet):
 
         try:
             post = Post.objects.get(pk=pk)
+            if post.user != request.user:
+                error_response = {"message": "You do not have permission to edit this post."}
+                return Response(error_response, status=status.HTTP_403_FORBIDDEN)
+        
+
             serializer = PostSerializer(post, data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -126,6 +131,10 @@ class BlogPostViewSet(viewsets.ViewSet):
 
         try:
             post = Post.objects.get(pk=pk)
+            if post.user != request.user:
+                error_response = {"message": "You do not have permission to delete this post."}
+                return Response(error_response, status=status.HTTP_403_FORBIDDEN)
+        
         except Post.DoesNotExist as e:
             error_response = {"message": "Something went wrong", "errors": str(e)}
             return Response(error_response, status=status.HTTP_404_NOT_FOUND)
@@ -150,9 +159,14 @@ class BlogPostViewSet(viewsets.ViewSet):
         title = serializer.validated_data.get("title", "No topic")
         post_id = serializer.validated_data.get("id", "No id")
         if title:
+            # Get the email addresses of the users who follow the author of the post
             receiver_emails = list(
-                User.objects.filter(is_active=True).values_list("email", flat=True)
+                User.objects.filter(
+                    is_active=True,
+                    followers__user_id=self.request.user.id
+                ).values_list("email", flat=True)
             )
+
             # Send email notification after post is created
             send_batch_notifications.delay(
                 subject="New Post Created",
@@ -286,8 +300,12 @@ class CommentViewSet(viewsets.ViewSet):
             comment_id = comment.id
 
             if post.title:
+                # Get the email addresses of the users who follow the author of the post
                 receiver_emails = list(
-                    User.objects.filter(is_active=True).values_list("email", flat=True)
+                    User.objects.filter(
+                        is_active=True,
+                        followers__user_id=self.request.user.id
+                    ).values_list("email", flat=True)
                 )
                 send_batch_notifications.delay(
                     subject="New comment has been added to the post: {}".format(
