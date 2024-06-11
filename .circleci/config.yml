@@ -19,12 +19,12 @@ jobs:
       # Build Docker image
       - run:
           name: Build Docker image
-          command: docker build -t limsapi/social_media:latest .
+          command: docker-compose build up --build
 
       # Run tests
       - run:
           name: Run tests
-          command: docker run --rm limsapi/social_media:latest . pytest
+          command: docker-compose run test
 
 
 workflows:
