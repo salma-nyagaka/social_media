@@ -76,8 +76,9 @@ To improve performance and scalability, caching mechanisms are used to reduce da
 
 2.  **Build and run your Docker**:
    - Used to start up all the services defined in a Docker Compose file, while also building or rebuilding the service images if necessary.
+
    ```bash
-   docker-compose up --build
+   docker-compose  up --build -d
    ```
 
 
