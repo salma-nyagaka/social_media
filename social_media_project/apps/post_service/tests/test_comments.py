@@ -24,6 +24,12 @@ class TestCommentAPI:
             email="testuser@example.com",
             is_active=True,
         )
+        self.user2 = User.objects.create_user(
+            username="otheruser",
+            password="testpass",
+            email="otheruser@example.com",
+            is_active=True,
+        )
         self.client.force_authenticate(user=self.user)
         self.factory = APIRequestFactory()
         self.post = Post.objects.create(
@@ -165,3 +171,33 @@ class TestCommentAPI:
         assert response.data["message"] == "Something went wrong"
         assert "detail" in response.data["errors"]
         assert response.data["errors"]["detail"] == "Test exception"
+
+    def test_delete_comment_no_permission(self):
+            """
+            Test that a user cannot update another user's comment.
+            """
+            self.client.force_authenticate(user=self.user2)
+            url = reverse("delete_comment", kwargs={"comment_id": self.comment.pk})
+            data = {
+                "content": "Delete comment by another user",
+            }
+            response = self.client.delete(url, data, format="json")
+
+
+            assert response.status_code == status.HTTP_403_FORBIDDEN
+            assert response.data == {'message': 'You do not have ownership rights to delete this comment'}
+            
+    def test_update_comment_no_permission(self):
+        """
+        Test that a user cannot update another user's comment.
+        """
+        self.client.force_authenticate(user=self.user2)
+        url = reverse("update_comment", kwargs={"comment_id": self.comment.pk})
+        data = {
+            "content": "Updated comment by another user",
+        }
+        response = self.client.put(url, data, format="json")
+
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.data == {'message': 'You do not have ownership rights to update this comment'}

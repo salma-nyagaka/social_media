@@ -128,7 +128,7 @@ class TestBlogPostAPI:
         response = self.client.put(url, data, format="json")
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        assert response.data["message"] == "You do not have permission to edit this post."
+        assert response.data["message"] == "You do not have ownership rights to edit this post."
 
         # Re-authenticate as the original user
         self.client.force_authenticate(user=self.user)
@@ -152,7 +152,7 @@ class TestBlogPostAPI:
         response = self.client.delete(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        assert response.data["message"] == "You do not have permission to delete this post."
+        assert response.data["message"] == "You do not have ownership rights to delete this post."
 
         # Re-authenticate as the original user
         self.client.force_authenticate(user=self.user)

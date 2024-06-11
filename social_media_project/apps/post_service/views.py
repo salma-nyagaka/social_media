@@ -92,7 +92,7 @@ class BlogPostViewSet(viewsets.ViewSet):
         try:
             post = Post.objects.get(pk=pk)
             if post.user != request.user:
-                error_response = {"message": "You do not have permission to edit this post."}
+                error_response = {"message": "You do not have ownership rights to edit this post."}
                 return Response(error_response, status=status.HTTP_403_FORBIDDEN)
         
 
@@ -132,7 +132,7 @@ class BlogPostViewSet(viewsets.ViewSet):
         try:
             post = Post.objects.get(pk=pk)
             if post.user != request.user:
-                error_response = {"message": "You do not have permission to delete this post."}
+                error_response = {"message": "You do not have ownership rights to delete this post."}
                 return Response(error_response, status=status.HTTP_403_FORBIDDEN)
         
         except Post.DoesNotExist as e:
@@ -253,6 +253,10 @@ class CommentViewSet(viewsets.ViewSet):
 
         try:
             comment = Comment.objects.get(pk=comment_id)
+            if comment.user != request.user:
+                error_response = {"message": "You do not have ownership rights to update this comment"}
+                return Response(error_response, status=status.HTTP_403_FORBIDDEN)
+
             serializer = CommentSerializer(comment, data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -276,6 +280,9 @@ class CommentViewSet(viewsets.ViewSet):
         """
         try:
             comment = Comment.objects.get(pk=comment_id)
+            if comment.user != request.user:
+                error_response = {"message": "You do not have ownership rights to delete this comment"}
+                return Response(error_response, status=status.HTTP_403_FORBIDDEN)
         except Comment.DoesNotExist as e:
             error_response = {"message": "Something went wrong", "errors": str(e)}
             return Response(error_response, status=status.HTTP_404_NOT_FOUND)
