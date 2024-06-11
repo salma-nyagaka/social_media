@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:13
+    image: postgres:16
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -21,7 +21,8 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
-
+    env_file:
+      - .env
   web:
     build:
       context: .
@@ -34,6 +35,8 @@ services:
       - db
       - redis
       - rabbitmq
+    env_file:
+      - .env
 
   celery:
     build:
@@ -45,6 +48,8 @@ services:
       - db
       - redis
       - rabbitmq
+    env_file:
+      - .env
 
   celery-beat:
     build:
@@ -56,6 +61,7 @@ services:
       - db
       - redis
       - rabbitmq
-
+    env_file:
+      - .env
 volumes:
   postgres_data:
