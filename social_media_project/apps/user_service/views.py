@@ -273,6 +273,8 @@ class UserViewSet(viewsets.ViewSet):
                 html_template="follow.html",
                 notification_type="follow",
             )
+            # Invalidate cache
+            cache.delete("users_list")
 
             return Response(context, status=status.HTTP_200_OK)
         else:
@@ -317,6 +319,8 @@ class UserViewSet(viewsets.ViewSet):
                     user_to_unfollow.username
                 )
             }
+            # Invalidate cache
+            cache.delete("users_list")
             return Response(context, status=status.HTTP_200_OK)
         else:
             return Response(
