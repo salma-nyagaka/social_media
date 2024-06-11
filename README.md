@@ -15,7 +15,7 @@
    - [User Service API Endpoints](#user-service-api-endpoints)
    - [Post Service API Endpoints](#post-service-api-endpoints)
 8. [ERD Diagram](#erd-diagram)
-
+9. [Collection](#collection)
 
 ## Introduction
 
@@ -136,3 +136,7 @@ To monitor and debug issues in your application, you can integrate Sentry, an er
 
 ## ERD Diagram
 ![sma drawio](https://github.com/salma-nyagaka/social_media/assets/36000749/8a39bb70-0dd4-4f99-9ad1-005b2d0b7a34)
+
+## Collection
+[TWIGA.postman_collection.json](https://github.com/user-attachments/files/15793816/TWIGA.postman_collection.json)
+

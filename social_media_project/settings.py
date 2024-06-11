@@ -36,7 +36,7 @@ ROOT_URLCONF = "social_media_project.urls"
 
 
 ALLOWED_HOSTS = [
-    '52.16.108.18',
+    '3.93.117.84',
     "127.0.0.1",
     "localhost",
 ]
