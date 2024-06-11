@@ -11,10 +11,11 @@ Here's a table of contents for the provided documentation:
    - [Prerequisites](#prerequisites)
    - [Installation](#installation)
 4. [Running the Application](#running-the-application)
-5. [API Endpoints](#api-endpoints)
+6. [Sentry Configuration](#sentry-configuration)
+7. [API Endpoints](#api-endpoints)
    - [User Service API Endpoints](#user-service-api-endpoints)
    - [Post Service API Endpoints](#post-service-api-endpoints)
-6. [ERD Diagram](#erd-diagram)
+8. [ERD Diagram](#erd-diagram)
 
 
 ## Introduction
