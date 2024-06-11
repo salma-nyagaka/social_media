@@ -12,7 +12,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      -# Setup Docker environment
       - setup_remote_docker:
           version: 20.10.7
 
