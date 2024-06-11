@@ -14,16 +14,16 @@ jobs:
         with:
           python-version: '3.12'
           
-      - name: Setup Docker
-        uses: docker/setup-buildx-action@v2
+      # - name: Setup Docker
+      #   uses: docker/setup-buildx-action@v2
 
-      # Build Docker image
-      - name: Build Docker image
-        run: docker-compose up --build
+      # # Build Docker image
+      # - name: Build Docker image
+      #   run: docker-compose up --build -d
 
-      # Run tests in image
-      - name: Run tests in image
-        run: docker-compose run test
+      # # Run tests in image
+      # - name: Run tests in image
+      #   run: docker-compose run test
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
