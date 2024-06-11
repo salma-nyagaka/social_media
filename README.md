@@ -1,5 +1,4 @@
-Here's a table of contents for the provided documentation:
-
+[![codecov](https://codecov.io/gh/salma-nyagaka/social_media/graph/badge.svg?token=OCYCVUXSBN)](https://codecov.io/gh/salma-nyagaka/social_media)Here's a table 
 ## Table of Contents
 
 1. [Introduction](#introduction)
