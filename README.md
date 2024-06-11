@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/salma-nyagaka/social_media/graph/badge.svg?token=OCYCVUXSBN)](https://codecov.io/gh/salma-nyagaka/social_media)Here's a table 
+[![codecov](https://codecov.io/gh/salma-nyagaka/social_media/graph/badge.svg?token=OCYCVUXSBN)](https://codecov.io/gh/salma-nyagaka/social_media)
 ## Table of Contents
 
 1. [Introduction](#introduction)
