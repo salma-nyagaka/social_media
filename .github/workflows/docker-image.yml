@@ -32,4 +32,5 @@ jobs:
         run: |
           echo "Starting Docker Compose with environment variables..."
           echo "DOMAIN_NAME=${{ secrets.DOMAIN_NAME }}" > .env
+          echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
     
