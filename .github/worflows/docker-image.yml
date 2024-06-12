@@ -3,7 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - ft-fix-deployment-issues
+      - fix-deployment-issues
 
 jobs:
   build-and-push:
