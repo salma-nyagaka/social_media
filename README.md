@@ -82,7 +82,7 @@ To improve performance and scalability, caching mechanisms via the Redis server 
    ```
 
 ### Running the Application
-1.  **Create a database user and a database using postgresql**:
+1.  **Create a  user and a database using postgresql**:
 
 2.  **Create and update .env file in the root directory**:
 - Update the DSN with the one created in your sentry account
