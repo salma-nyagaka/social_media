@@ -134,6 +134,7 @@ To monitor and debug issues in your application, you can integrate Sentry, an er
 
 ### Post Service API Endpoints
 
+**__Note__**: Only users that follow the author can receive notifications
 | Method | Endpoint                          | Description                             |
 |--------|-----------------------------------|-----------------------------------------|
 | POST   | `{{base_url}}/blogs/`             | Create a new post.                      |
