@@ -31,16 +31,15 @@ jobs:
       - name: Deploy
         run: |
           echo "Starting Docker Compose with environment variables..."
-          echo "${{ secrets.DOMAIN_NAME }}" > .env
-          echo "${{ secrets.SECRET_KEY }}" >> .env
-          echo "${{ secrets.EMAIL_HOST_USER }}" >> .env
-          echo "${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
-          echo "${{ secrets.DEFAULT_FROM_EMAIL }}" >> .env
-          echo "${{ secrets.DATABASE_NAME }}" >> .env
-          echo "${{ secrets.DATABASE_USER }}" >> .env
-          echo "${{ secrets.DATABASE_PASSWORD }}" >> .env
-          echo "${{ secrets.DATABASE_HOST }}" >> .env
-          echo "${{ secrets.DATABASE_PORT }}" >> .env
-          echo "${{ secrets.DSN }}" >> .env
+          echo "DOMAIN_NAME=${{ secrets.DOMAIN_NAME }}" > .env
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+          echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> .env
+          echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
+          echo "DEFAULT_FROM_EMAIL=${{ secrets.DEFAULT_FROM_EMAIL }}" >> .env
+          echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
+          echo "DATABASE_USER=${{ secrets.DATABASE_USER }}" >> .env
+          echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
+          echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
+          echo "DATABASE_PORT=${{ secrets.DATABASE_PORT }}" >> .env
+          echo "DSN=${{ secrets.DSN }}" >> .env
           docker-compose up -d
-
