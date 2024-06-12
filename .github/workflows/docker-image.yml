@@ -37,6 +37,6 @@ jobs:
           echo "DEFAULT_FROM_EMAIL=${{ secrets.DEFAULT_FROM_EMAIL }}" >> .env
           echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
           echo "DATABASE_USER=${{ secrets.DATABASE_USER }}" >> .env
-
+          cat .env
           docker-compose up -d
     
