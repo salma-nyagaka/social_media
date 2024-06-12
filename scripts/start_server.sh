@@ -4,5 +4,5 @@ cd /opt/twiga/social_media
 docker-compose run web python manage.py makemigrations
 docker-compose run web python manage.py migrate
 
-# Start Docker containers
-docker-compose up --build -d
+# Start Docker containers without rebuilding every time
+docker-compose up -d
