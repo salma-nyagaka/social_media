@@ -85,7 +85,7 @@ To improve performance and scalability, caching mechanisms via the Redis server 
 1.  **Create a  user and a database using postgresql**:
 
 2.  **Create and update .env file in the root directory**:
-- Update the DSN with the one created in your sentry account
+**__Update the DSN with the one created in your sentry account__**
    ```bash
    DOMAIN_NAME='http://127.0.1:8000'
    SECRET_KEY="django-insecure-xi@@*gceecx#9^^311qpn6#l-e=ydu!5#9uxjrna5=7fw*ch^^"
