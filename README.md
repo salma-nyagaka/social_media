@@ -79,35 +79,35 @@ To improve performance and scalability, caching mechanisms via the Redis server 
    ```bash
    git clone https://github.com/salma-nyagaka/social_media.git
    cd social_media_project
-   ```
-
+   ``
 
 ### Running the Application
-1.  **Create and update .env file in the root directory**:
+1.  **Create a database user and a database using postgresql**:
+
+2.  **Create and update .env file in the root directory**:
 - Update the DSN with the one created in your sentry account
    ```bash
    DOMAIN_NAME='http://127.0.1:8000'
-SECRET_KEY="django-insecure-xi@@*gceecx#9^^311qpn6#l-e=ydu!5#9uxjrna5=7fw*ch^^"
-EMAIL_HOST_USER="salmanyagaka@gmail.com"
-EMAIL_HOST_PASSWORD="oycj urnx ceiw rexn"
-DEFAULT_FROM_EMAIL="salmanyagaka@gmail.com"
-DATABASE_NAME='your_db_name'
-DATABASE_USER='your_db_user'
-DATABASE_PASSWORD='your_db_pass'
-DATABASE_HOST="db"
-DATABASE_PORT='5432'
-DSN="https://4f59239970b87c64005a1439e5d93405@o4507386132889600.ingest.us.sentry.io/4507386135314432"
-```
+   SECRET_KEY="django-insecure-xi@@*gceecx#9^^311qpn6#l-e=ydu!5#9uxjrna5=7fw*ch^^"
+   EMAIL_HOST_USER="salmanyagaka@gmail.com"
+   EMAIL_HOST_PASSWORD="oycj urnx ceiw rexn"
+   DEFAULT_FROM_EMAIL="salmanyagaka@gmail.com"
+   DATABASE_NAME='your_db_name'
+   DATABASE_USER='your_db_user'
+   DATABASE_PASSWORD='your_db_pass'
+   DATABASE_HOST="db"
+   DATABASE_PORT='5432'
+   DSN="https://4f59239970b87c64005a1439e5d93405@o4507386132889600.ingest.us.sentry.io/4507386135314432"
+   ```
 
-2.  **Build and run your Docker**:
+3.  **Build and run your Docker**:
    - Used to start up all the services defined in a Docker Compose file, while also building or rebuilding the service images if necessary.
 
    ```bash
    docker-compose  up --build
    ```
 
-
-3. **Run the tests**:
+4. **Run the tests**:
    ```bash
    docker-compose run tests
    ```
