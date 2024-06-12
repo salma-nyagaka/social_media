@@ -98,10 +98,10 @@ WSGI_APPLICATION = "social_media_project.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": 'social_media_project',
-        "USER": 'salmanyagaka',
-        "PASSWORD": 'salma',
-        "HOST":'db',
+        "NAME": os.getenv('DATABASE_NAME', ''),
+        "USER": os.getenv('DATABASE_USER', ''),
+        "PASSWORD": os.getenv('DATABASE_PASSWORD', ''),
+        "HOST":os.getenv('DATABASE_HOST', ''),
         "PORT": "5432",
     }
 }
@@ -239,7 +239,7 @@ CACHES = {
 
 
 sentry_sdk.init(
-    dsn="https://4f59239970b87c64005a1439e5d93405@o4507386132889600.ingest.us.sentry.io/4507386135314432",
+    dsn=os.getenv('DSN', ''),
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     traces_sample_rate=1.0,
