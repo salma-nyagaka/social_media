@@ -1,8 +1,14 @@
 #!/bin/bash
-# Navigate to project directory
+set -e
+
+# Navigate to the project directory
 cd /opt/twiga/social_media
-# docker-compose run web python manage.py makemigrations
-# docker-compose run web python manage.py migrate
+
+# Pull the latest Docker images
+docker-compose pull
+
+# Remove any existing containers
+docker-compose down
 
 # Start Docker containers without rebuilding every time
 docker-compose up -d
