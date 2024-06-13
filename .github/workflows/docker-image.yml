@@ -40,7 +40,7 @@ jobs:
         run: |
           echo "${{ secrets.EC2_KEY }}" | tr -d '\r' > ec2_key.pem
           chmod 600 ec2_key.pem
-          ssh -i ec2_key.pem ubuntu@${{secrets.EC2_HOST}} << 'EOF'
+          ssh -v -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
             set -e
             cd /opt/twiga/social_media || mkdir -p /opt/twiga/social_media && cd /opt/twiga/social_media
             git pull origin main
