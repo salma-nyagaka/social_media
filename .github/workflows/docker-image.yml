@@ -38,12 +38,9 @@ jobs:
           DEFAULT_FROM_EMAIL: ${{ secrets.DEFAULT_FROM_EMAIL }}
           DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
         run: |
-          echo "${{ secrets.EC2_KEY }}" | tr -d '\r' > ec2_key.pem
-          cat > ec2_key.pem << 'EOF'
-          ${SECRETS.EC2_KEY}
-          EOF
-          chmod 600 EC2_KEY
-          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@${{ secrets.EC2_HOST }} << 'SSH_EOF'
+          echo "${{ secrets.EC2_KEY }}" > ec2_key.pem
+          chmod 600 ec2_key.pem
+          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
             set -e
             cd /opt/twiga/social_media || mkdir -p /opt/twiga/social_media && cd /opt/twiga/social_media
             git pull origin main
@@ -65,5 +62,5 @@ jobs:
             
             # Start Docker containers without rebuilding every time
             docker-compose up -d --build
-          SSH_EOF
+          EOF
           rm ec2_key.pem
