@@ -78,10 +78,12 @@ jobs:
           DEFAULT_FROM_EMAIL: ${{ secrets.DEFAULT_FROM_EMAIL }}
           DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
         run: |
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_KEY }} ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+          echo "${{ secrets.EC2_KEY }}" > ec2_key.pem
+          chmod 600 ec2_key.pem
+          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
             set -e
             cd /opt/twiga/social_media || mkdir -p /opt/twiga/social_media && cd /opt/twiga/social_media
-            git pull origin develop
+            git pull origin main
             
             # Ensure the .env file is created
             echo "Creating .env file with secrets..."
@@ -100,4 +102,5 @@ jobs:
             
             # Start Docker containers without rebuilding every time
             docker-compose up -d --build
-          
+          EOF
+          rm ec2_key.pem
