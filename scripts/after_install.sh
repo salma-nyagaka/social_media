@@ -17,3 +17,5 @@ source .env
 # Install Python dependencies
 pip install -r /opt/twiga/social_media/requirements.txt
 pip install psycopg2-binary
+
+systemctl restart apacge
