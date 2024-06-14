@@ -54,7 +54,9 @@ cd /opt/twiga/social_media
 #!/bin/bash
 
 # Stop the existing container (if running)
+docker stop social_media_project || true
 docker stop social_media_app || true
 
 # Remove the existing container
+docker rm social_media_project || true
 docker rm social_media_app || true
