@@ -7,6 +7,7 @@ sudo rm -rf /var/log/*
 sudo rm -rf /tmp/*
 sudo rm -rf /var/tmp/*
 
+
 # Stop and remove all Docker containers
 docker stop $(docker ps -a -q) || true
 docker rm $(docker ps -a -q) || true
