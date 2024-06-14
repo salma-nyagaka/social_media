@@ -18,4 +18,7 @@ source .env
 pip install -r /opt/twiga/social_media/requirements.txt
 pip install psycopg2-binary
 
-systemctl restart apacge
+python manage.py makemigrations
+python manage.py migrate
+
+systemctl restart apache
