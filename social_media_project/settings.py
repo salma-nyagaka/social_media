@@ -96,8 +96,8 @@ WSGI_APPLICATION = "social_media_project.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv('DATABASE_NAME', 'salmanyagaka'),
-        "USER": os.getenv('DATABASE_USER', 'social_media_project'),
+        "NAME": os.getenv('DATABASE_NAME', 'social_media_project'),
+        "USER": os.getenv('DATABASE_USER', 'postgres'),
         "PASSWORD": os.getenv('DATABASE_PASSWORD', ''),
         "HOST":os.getenv('DATABASE_HOST', 'localhost'),
         "PORT": "5432",
