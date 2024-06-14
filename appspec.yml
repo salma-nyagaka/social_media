@@ -6,6 +6,6 @@ files:
 
 hooks:
   BeforeInstall:
-      - location: scripts/before_install.sh
+      - location: scripts/befor_install.sh
   AfterInstall:
       - location: scripts/after_install.sh
