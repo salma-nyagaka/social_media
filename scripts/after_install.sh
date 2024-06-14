@@ -23,4 +23,5 @@ python3 manage.py migrate
 
 sudo systemctl restart celery-worker
 sudo systemctl restart celery-beat
+
 systemctl restart apache2
