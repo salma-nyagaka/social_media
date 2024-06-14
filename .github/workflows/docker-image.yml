@@ -32,8 +32,8 @@ jobs:
           echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
           cat .env
 
-      - name: Copy .env to Docker build context
-        run: cp .env .
+      #- name: Copy .env to Docker build context
+      #  run: cp .env .
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
