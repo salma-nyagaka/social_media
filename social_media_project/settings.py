@@ -96,10 +96,10 @@ WSGI_APPLICATION = "social_media_project.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv('DATABASE_NAME', ''),
-        "USER": os.getenv('DATABASE_USER', ''),
+        "NAME": os.getenv('DATABASE_NAME', 'salmanyagaka'),
+        "USER": os.getenv('DATABASE_USER', 'social_media_project'),
         "PASSWORD": os.getenv('DATABASE_PASSWORD', ''),
-        "HOST":os.getenv('DATABASE_HOST', ''),
+        "HOST":os.getenv('DATABASE_HOST', 'localhost'),
         "PORT": "5432",
     }
 }
@@ -193,8 +193,8 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "")
 
 
 # settings.py
-# CELERY_BROKER_URL = "amqp://localhost"
-CELERY_BROKER_URL = 'amqp://salmanyagaka:salma@rabbitmq:5672//'
+CELERY_BROKER_URL = "amqp://localhost"
+# CELERY_BROKER_URL = 'amqp://salmanyagaka:salma@rabbitmq:5672//'
 
 CELERY_RESULT_BACKEND = "rpc://"
 CELERY_ACCEPT_CONTENT = ["json"]
@@ -205,25 +205,25 @@ CELERY_TIMEZONE = "UTC"
 
 DOMAIN_NAME = os.getenv("DOMAIN_NAME", "")
 
-CACHES = {
-     'default': {
-         'BACKEND': 'django_redis.cache.RedisCache',
-         'LOCATION': 'redis://redis:6379/1',
-         'OPTIONS': {
-             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-         }
-     }
- }
-
 # CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": "redis://127.0.0.1:6379/1",
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#         },
-#     }
-# }
+#      'default': {
+#          'BACKEND': 'django_redis.cache.RedisCache',
+#          'LOCATION': 'redis://redis:6379/1',
+#          'OPTIONS': {
+#              'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+#          }
+#      }
+#  }
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
 
 # CACHES = {
 #     'default': {
