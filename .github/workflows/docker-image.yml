@@ -3,7 +3,6 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - main
       - fix-deployment-issues
 
 jobs:
@@ -23,44 +22,23 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Create .env file
+        run: |
+          echo "DOMAIN_NAME=${{ secrets.DOMAIN_NAME }}" > .env
+          echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
+          echo "DEFAULT_FROM_EMAIL=${{ secrets.DEFAULT_FROM_EMAIL }}" >> .env
+          echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
+          echo "DATABASE_USER=${{ secrets.DATABASE_USER }}" >> .env
+          echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
+          cat .env
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
           context: .
+          file: Dockerfile
           push: true
-          tags: limsapi/social_media:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/social_media:latest
 
-      - name: Deploy to EC2
-        env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
-          DEFAULT_FROM_EMAIL: ${{ secrets.DEFAULT_FROM_EMAIL }}
-          DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
-        run: |
-          echo "${{ secrets.EC2_KEY }}" > ec2_key.pem
-          chmod 600 ec2_key.pem
-          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
-            set -e
-            cd /opt/twiga/social_media || mkdir -p /opt/twiga/social_media && cd /opt/twiga/social_media
-            git pull origin main
-            
-            # Ensure the .env file is created
-            echo "Creating .env file with secrets..."
-            echo "SECRET_KEY=${SECRET_KEY}" > .env
-            echo "DATABASE_URL=${DATABASE_URL}" >> .env
-            echo "EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}" >> .env
-            echo "DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL}" >> .env
-            echo "DOMAIN_NAME=${DOMAIN_NAME}" >> .env
-            cat .env
-            
-            # Pull the latest Docker images
-            docker-compose pull
-            
-            # Remove any existing containers
-            docker-compose down
-            
-            # Start Docker containers without rebuilding every time
-            docker-compose up -d --build
-          EOF
-          rm ec2_key.pem
+      - name: Deploy
+        run: docker-compose up -d

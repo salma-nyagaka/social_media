@@ -13,6 +13,9 @@ RUN apt-get update && apt-get install -y \
 # Set the working directory in the container
 WORKDIR /app
 
+# Copy the .env file into the image
+COPY .env /app/.env
+
 # Copy the requirements file into the container
 COPY requirements.txt .
 
