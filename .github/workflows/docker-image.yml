@@ -43,6 +43,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/social_media:latest
 
+
       - name: SSH to EC2 and deploy
         uses: appleboy/ssh-action@v0.1.6
         with:
