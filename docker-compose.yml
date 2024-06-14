@@ -21,10 +21,11 @@ services:
       - "5672:5672"
     env_file:
       - .env
-
   web:
-    image: limsapi/social_media:latest
+    build:
+      context: .
     command: ["sh", "-c", "until python manage.py makemigrations && python manage.py migrate; do echo 'Waiting for db...'; sleep 5; done && gunicorn --bind 0.0.0.0:8000 social_media_project.wsgi:application"]
+    #command: ["sh", "-c", "until python manage.py makemigrations && python manage.py migrate; do echo 'Waiting for db...'; sleep 5; done && python manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8000 social_media_project.wsgi:application"]
     volumes:
       - .:/app
     ports:
@@ -37,7 +38,8 @@ services:
       - .env
 
   celery:
-    image: limsapi/social_media:latest
+    build:
+      context: .
     command: ["sh", "-c", "until python manage.py makemigrations && python manage.py migrate; do echo 'Waiting for db...'; sleep 5; done && celery -A social_media_project worker --loglevel=info"]
     volumes:
       - .:/app
@@ -49,7 +51,8 @@ services:
       - .env
 
   celery-beat:
-    image: limsapi/social_media:latest
+    build:
+      context: .
     command: ["sh", "-c", "until python manage.py makemigrations && python manage.py migrate; do echo 'Waiting for db...'; sleep 5; done && celery -A social_media_project beat --loglevel=info"]
     volumes:
       - .:/app
@@ -61,7 +64,8 @@ services:
       - .env
 
   test:
-    image: limsapi/social_media:latest
+    build:
+      context: .
     command: ["sh", "-c", "until python manage.py makemigrations && python manage.py migrate; do echo 'Waiting for db...'; sleep 5; done && pytest --cov=social_media_project/apps --cov-report=term-missing --cov-report=html"]
     volumes:
       - .:/app
@@ -71,6 +75,5 @@ services:
       - rabbitmq
     env_file:
       - .env
-
 volumes:
-  postgres_data:
+  postgres_data

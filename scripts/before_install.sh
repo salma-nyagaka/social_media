@@ -12,7 +12,3 @@ sudo docker system prune -a
 # Start and enable Docker
 sudo systemctl start docker
 sudo systemctl enable docker
-
-
-# Remove the existing directory or file
-sudo rm -rf /opt/twiga/social_media/
