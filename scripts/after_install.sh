@@ -44,6 +44,7 @@
 # Navigate to project directory
 cd /opt/twiga/social_media
 
+
 # Pull the pre-built Docker images
 # docker-compose pull
 
