@@ -58,6 +58,3 @@ docker stop social_media_app || true
 
 # Remove the existing container
 docker rm social_media_app || true
-
-# Run the new container
-docker run -d -p 8000:8000 --env-file /opt/.env --name social_media_app limsapi/social_media:latest
