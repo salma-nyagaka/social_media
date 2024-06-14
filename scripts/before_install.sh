@@ -2,8 +2,6 @@
 
 # Clean up unnecessary files to free up space
 sudo apt-get clean
-*
-
 
 # Stop and remove all Docker containers
 docker stop $(docker ps -a -q) || true
