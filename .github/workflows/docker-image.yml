@@ -85,6 +85,3 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/social_media:latest
 
-      - name: Deploy
-        run: docker-compose up -d
-
