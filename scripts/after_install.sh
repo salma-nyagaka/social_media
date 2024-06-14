@@ -21,4 +21,4 @@ pip install psycopg2-binary
 python manage.py makemigrations
 python manage.py migrate
 
-systemctl restart apache
+systemctl restart apache2
