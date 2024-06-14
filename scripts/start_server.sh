@@ -9,6 +9,7 @@ docker pull limsapi/social_media:latest
 # Copy the .env file to the project directory
 cp /opt/.env /opt/twiga/social_media/.env
 
+docker-compose down
 # Stop the existing container if it is running
 docker stop social_media_app || true
 
@@ -16,4 +17,4 @@ docker stop social_media_app || true
 docker rm social_media_app || true
 
 # Run the new container
-docker run -d -p 8000:8000 --env-file /opt/.env --name social_media_app limsapi/social_media:latest
+docker run -d --name social_media_app limsapi/social_media:latest
