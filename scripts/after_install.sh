@@ -51,3 +51,5 @@ cd /opt/twiga/social_media
 
 # Remove any existing containers
 docker-compose down
+
+docker pull limsapi/social_media:latest

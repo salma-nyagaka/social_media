@@ -2,5 +2,5 @@
 # Navigate to project directory
 cd /opt/twiga/social_media
 
-docker-compose pull
-docker-compose up -d --build
+
+docker run -d --env-file /opt/.env --name social_media_app limsapi/social_media:latest
