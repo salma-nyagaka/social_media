@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # Clean up unnecessary files to free up space
 sudo apt-get clean

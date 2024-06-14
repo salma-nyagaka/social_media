@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # Navigate to the project directory
 cd /opt/twiga/social_media
