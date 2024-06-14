@@ -8,7 +8,6 @@ sudo rm -rf /var/log/*
 sudo rm -rf /tmp/*
 sudo rm -rf /var/tmp/*
 
-
 # Start and enable Docker
 sudo systemctl start docker
 sudo systemctl enable docker
