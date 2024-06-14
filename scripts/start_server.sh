@@ -5,16 +5,7 @@ set -e
 cd /opt/twiga/social_media
 
 
-
-docker-compose up -d --build
-
-# # Pull the latest Docker images
-# docker-compose pull
-
-# # Remove any existing containers
-# docker-compose down
-
-# # Start Docker containers without rebuilding every time
-# docker build -t  limsapi/social_media:latest .
-
-# docker-compose up -d
+# Run the new container
+# docker run -d --name social_media_app limsapi/social_media:latest
+docker-compose build
+docker-compose up -d

@@ -1,24 +1,46 @@
-#!/bin/bash
-set -e
-
-# Navigate to the project directory
+# # #!/bin/bash
 cd /opt/twiga/social_media
 
-# Check if the .env file exists, create if it doesn't
-if [ ! -f .env ]; then
-  echo "Creating .env file..."
-  echo "SECRET_KEY=${SECRET_KEY}" > .env
-  echo "DATABASE_URL=${DATABASE_URL}" >> .env
-  echo "EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}" >> .env
-  echo "DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL}" >> .env
-  echo "DOMAIN_NAME=${DOMAIN_NAME}" >> .env
-fi
 
-# Pull the latest Docker images
-docker-compose pull
+# Stop the existing container (if running)
+docker stop # # #!/bin/bash
+cd /opt/twiga/social_media
 
-# Remove any existing containers
+
+# Stop the existing container (if running)
+docker stop social_media_project || true
+docker stop social_media_app || true
+
+# Remove the existing container
+docker rm social_media_project || true
+docker rm social_media_app || true
+
+
+
+# Copy the .env file to the project directory
+cp /opt/.env /opt/twiga/social_media/.env
+
 docker-compose down
+# Stop the existing container if it is running
+docker stop social_media_app || true
 
-# Start Docker containers without rebuilding every time
-docker-compose up -d --build
+# Remove the existing container if it exists
+docker rm social_media_app || true
+social_media_project || true
+docker stop social_media_app || true
+
+# Remove the existing container
+docker rm social_media_project || true
+docker rm social_media_app || true
+
+
+
+# Copy the .env file to the project directory
+cp /opt/.env /opt/twiga/social_media/.env
+
+docker-compose down
+# Stop the existing container if it is running
+docker stop social_media_app || true
+
+# Remove the existing container if it exists
+docker rm social_media_app || true
