@@ -187,9 +187,9 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "salmanyagaka@gmail.com")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "oycj urnx ceiw rexn")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "salmanyagaka@gmail.com")
 
 
 # settings.py
@@ -203,7 +203,7 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
 
 
-DOMAIN_NAME = os.getenv("DOMAIN_NAME", "")
+DOMAIN_NAME = os.getenv("DOMAIN_NAME", "http://18-212-98-247")
 
 # CACHES = {
 #      'default': {
@@ -237,7 +237,7 @@ CACHES = {
 
 
 sentry_sdk.init(
-    dsn=os.getenv('DSN', ''),
+    dsn=os.getenv('DSN', 'https://4f59239970b87c64005a1439e5d93405@o4507386132889600.ingest.us.sentry.io/4507386135314432'),
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     traces_sample_rate=1.0,
