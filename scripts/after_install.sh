@@ -21,7 +21,7 @@ pip install psycopg2-binary
 python3 manage.py makemigrations
 python3 manage.py migrate
 
-sudo systemctl restart celery-worker
-sudo systemctl restart celery-beat
+# sudo systemctl restart celery-worker
+# sudo systemctl restart celery-beat
 
 systemctl restart apache2
