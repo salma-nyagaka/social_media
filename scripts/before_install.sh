@@ -4,6 +4,10 @@
 DEPLOYMENT_GROUP=$(aws deploy list-deployment-groups --application-name credrails --output text --query "deploymentGroups[0]")
 export DEPLOYMENT_GROUP
 
+echo "Cleaning up previous deployments"
+sudo service apache2 stop
+sudo rm -rf /var/www/html/*
+sudo rm -rf /opt/codedeploy-agent/deployment-root/*
 
 # Update OS & install Python3
 sudo apt-get update
@@ -14,3 +18,4 @@ pip install -r requirements.txt
 
 # Delete the app directory to ensure a clean installation
 sudo rm -rf /opt/twiga/social_media
+
