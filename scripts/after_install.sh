@@ -17,7 +17,3 @@ cp /opt/.env /opt/twiga/social_media/.env
 
 # Bring down any existing containers
 sudo docker-compose down
-
-# Remove any existing containers
-sudo docker stop social_media_app || true
-sudo docker rm social_media_app || true
