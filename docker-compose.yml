@@ -88,7 +88,6 @@ services:
     image: redis:6
 
   rabbitmq:
-    image: rabbitmq:3-management
     environment:
       RABBITMQ_DEFAULT_USER: salmanyagaka
       RABBITMQ_DEFAULT_PASS: salma
@@ -100,13 +99,9 @@ services:
 
   web:
     build: .
-    command: >
-      sh -c "
-      ./wait-for-it.sh db:5432 -- 
-      python manage.py makemigrations && python manage.py migrate && gunicorn --bind 0.0.0.0:8000 social_media_project.wsgi:application"
+    command: ["sh", "-c", "until python manage.py makemigrations && python manage.py migrate; do echo 'Waiting for db...'; sleep 5; done && gunicorn --bind 0.0.0.0:8000 social_media_project.wsgi:application"]
     volumes:
       - .:/app
-      - ./wait-for-it.sh:/wait-for-it.sh
     ports:
       - "8000:8000"
     depends_on:
@@ -118,13 +113,9 @@ services:
 
   celery:
     build: .
-    command: >
-      sh -c "
-      ./wait-for-it.sh db:5432 -- 
-      python manage.py makemigrations && python manage.py migrate && celery -A social_media_project worker --loglevel=info"
+    command: ["sh", "-c", "until python manage.py makemigrations && python manage.py migrate; do echo 'Waiting for db...'; sleep 5; done && celery -A social_media_project worker --loglevel=info"]
     volumes:
       - .:/app
-      - ./wait-for-it.sh:/wait-for-it.sh
     depends_on:
       - db
       - redis
@@ -134,13 +125,9 @@ services:
 
   celery-beat:
     build: .
-    command: >
-      sh -c "
-      ./wait-for-it.sh db:5432 -- 
-      python manage.py makemigrations && python manage.py migrate && celery -A social_media_project beat --loglevel=info"
+    command: ["sh", "-c", "until python manage.py makemigrations && python manage.py migrate; do echo 'Waiting for db...'; sleep 5; done && celery -A social_media_project beat --loglevel=info"]
     volumes:
       - .:/app
-      - ./wait-for-it.sh:/wait-for-it.sh
     depends_on:
       - db
       - redis
@@ -150,13 +137,9 @@ services:
 
   test:
     build: .
-    command: >
-      sh -c "
-      ./wait-for-it.sh db:5432 -- 
-      python manage.py makemigrations && python manage.py migrate && pytest --cov=social_media_project/apps --cov-report=term-missing --cov-report=html"
+    command: ["sh", "-c", "until python manage.py makemigrations && python manage.py migrate; do echo 'Waiting for db...'; sleep 5; done && pytest --cov=social_media_project/apps --cov-report=term-missing --cov-report=html"]
     volumes:
       - .:/app
-      - ./wait-for-it.sh:/wait-for-it.sh
     depends_on:
       - db
       - redis
@@ -166,4 +149,3 @@ services:
 
 volumes:
   postgres_data:
-
