@@ -12,6 +12,7 @@ services:
     image: redis:6
 
   rabbitmq:
+    image: rabbitmq:3-management
     environment:
       RABBITMQ_DEFAULT_USER: salmanyagaka
       RABBITMQ_DEFAULT_PASS: salma
