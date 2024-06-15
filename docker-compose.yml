@@ -81,8 +81,12 @@ services:
     image: postgres:16
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    env_file:
-      - .env
+    environment:
+      POSTGRES_DB: social_media_db
+      POSTGRES_USER: social_media_user
+      POSTGRES_PASSWORD: social_media_password
+    # env_file:
+    #   - .env
 
   redis:
     image: redis:6
