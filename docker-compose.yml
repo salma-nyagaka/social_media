@@ -150,7 +150,9 @@
 
 # volumes:
 #   postgres_data:
-
+# POSTGRES_USER='salmanyagaka'
+# POSTGRES_PASSWORD='salma'
+# POSTGRES_DB='social_media_project'
 
 version: '3.8'
 
@@ -161,6 +163,10 @@ services:
       - postgres_data:/var/lib/postgresql/data
     env_file:
       - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
       interval: 30s
