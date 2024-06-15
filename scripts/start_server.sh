@@ -4,5 +4,6 @@
 cd /opt/twiga/social_media
 
 # Run the new container
+docker-compose down
 docker-compose build
 docker-compose up -d
