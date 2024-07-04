@@ -406,6 +406,7 @@ class ActivateAccountAPIView(APIView):
         Returns:
             Response: A rendered HTML response indicating the success or failure of the account activation.
         """
+        
 
         try:
             decoded_token = jwt.decode(token, options={"verify_signature": False})
