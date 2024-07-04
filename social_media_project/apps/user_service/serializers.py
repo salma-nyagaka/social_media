@@ -45,6 +45,8 @@ class UserSerializer(serializers.ModelSerializer):
             {
                 "follower_user_id": follower.user_id.id,
                 "username": follower.user_id.username,
+                "email": follower.user_id.email
+                
             }
             for follower in followers
         ]
@@ -55,6 +57,7 @@ class UserSerializer(serializers.ModelSerializer):
             {
                 "user_id": followee.following_user_id.id,
                 "username": followee.following_user_id.username,
+                "email": followee.following_user_id.email
             }
             for followee in following
         ]
