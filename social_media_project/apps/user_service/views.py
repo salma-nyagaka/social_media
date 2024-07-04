@@ -149,9 +149,11 @@ class UserViewSet(viewsets.ViewSet):
         try:
             user = User.objects.get(pk=pk)
             if user.id != request.user.id:
-                error_response = {"message": "You do not have permission to edit this profile."}
+                error_response = {
+                    "message": "You do not have permission to edit this profile."
+                }
                 return Response(error_response, status=status.HTTP_403_FORBIDDEN)
-        
+
             serializer = UserUpdateSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -187,9 +189,11 @@ class UserViewSet(viewsets.ViewSet):
         try:
             user = User.objects.get(pk=pk)
             if user.id != request.user.id:
-                error_response = {"message": "You do not have permission to delete this profile."}
+                error_response = {
+                    "message": "You do not have permission to delete this profile."
+                }
                 return Response(error_response, status=status.HTTP_403_FORBIDDEN)
-        
+
         except User.DoesNotExist:
             context = {
                 "message": "Something went wrong",
@@ -239,7 +243,7 @@ class UserViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         user = request.user
- 
+
         if user_to_follow.is_active == False:
             return Response(
                 {"status": "You cannot follow this user. Account is inactive"},
@@ -374,16 +378,11 @@ class UserLoginAPIView(APIView):
                 return Response(serializer.validated_data, status=status.HTTP_200_OK)
         except serializers.ValidationError as e:
             error_detail = e.detail
-            if isinstance(error_detail, list):
-                error_response = {
-                    "message": "Something went wrong",
-                    "errors": {"non_field_errors": error_detail},
-                }
-            else:
-                error_response = {
-                    "message": error_detail.get("message", "Something went wrong"),
-                    "errors": error_detail.get("errors", {}),
-                }
+
+            error_response = {
+                "message": "Something went wrong",
+                "errors": error_detail,
+            }
             return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -411,6 +410,7 @@ class ActivateAccountAPIView(APIView):
         try:
             decoded_token = jwt.decode(token, options={"verify_signature": False})
             user = User.objects.get(pk=decoded_token["user_id"])
+            cache.delete("users_list")
         except (jwt.exceptions.DecodeError, User.DoesNotExist):
             user = None
 

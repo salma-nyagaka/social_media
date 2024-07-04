@@ -43,12 +43,12 @@ class TestCommentAPI:
         """
         Test listing all comments.
         """
-        url = reverse("list_comments")
+        url = reverse("list_comments", kwargs={"post_pk": self.post.pk})
         response = self.client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert "data" in response.data
-        assert response.data["message"] == "Comments retrieved successfully"
+        assert response.data["message"] == "Comments for post retrieved successfully"
 
     def test_create_comment(self):
         """
@@ -100,7 +100,7 @@ class TestCommentAPI:
         """
         Test updating an existing comment.
         """
-        url = reverse("update_comment", kwargs={"comment_id": self.comment.pk})
+        url = reverse("update_comment", kwargs={"pk": self.comment.pk})
         data = {
             "post": self.post.id,
             "content": "Updated comment",
@@ -114,7 +114,7 @@ class TestCommentAPI:
         """
         Test updating a non-existent comment.
         """
-        url = reverse("update_comment", kwargs={"comment_id": 999})
+        url = reverse("update_comment", kwargs={"pk": 999})
         data = {
             "content": "Updated comment",
         }
@@ -126,7 +126,7 @@ class TestCommentAPI:
         """
         Test updating a comment with no content.
         """
-        url = reverse("update_comment", kwargs={"comment_id": self.comment.pk})
+        url = reverse("update_comment", kwargs={"pk": self.comment.pk})
         data = {
             "content": "",
         }
@@ -138,7 +138,7 @@ class TestCommentAPI:
         """
         Test deleting an existing comment.
         """
-        url = reverse("delete_comment", kwargs={"comment_id": self.comment.pk})
+        url = reverse("delete_comment", kwargs={"pk": self.comment.pk})
         response = self.client.delete(url)
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -147,7 +147,7 @@ class TestCommentAPI:
         """
         Test deleting a non-existent comment.
         """
-        url = reverse("delete_comment", kwargs={"comment_id": 999})
+        url = reverse("delete_comment", kwargs={"pk": 999})
         response = self.client.delete(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -173,31 +173,33 @@ class TestCommentAPI:
         assert response.data["errors"]["detail"] == "Test exception"
 
     def test_delete_comment_no_permission(self):
-            """
-            Test that a user cannot update another user's comment.
-            """
-            self.client.force_authenticate(user=self.user2)
-            url = reverse("delete_comment", kwargs={"comment_id": self.comment.pk})
-            data = {
-                "content": "Delete comment by another user",
-            }
-            response = self.client.delete(url, data, format="json")
+        """
+        Test that a user cannot update another user's comment.
+        """
+        self.client.force_authenticate(user=self.user2)
+        url = reverse("delete_comment", kwargs={"pk": self.comment.pk})
+        data = {
+            "content": "Delete comment by another user",
+        }
+        response = self.client.delete(url, data, format="json")
 
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.data == {
+            "message": "You do not have ownership rights to delete this comment"
+        }
 
-            assert response.status_code == status.HTTP_403_FORBIDDEN
-            assert response.data == {'message': 'You do not have ownership rights to delete this comment'}
-            
     def test_update_comment_no_permission(self):
         """
         Test that a user cannot update another user's comment.
         """
         self.client.force_authenticate(user=self.user2)
-        url = reverse("update_comment", kwargs={"comment_id": self.comment.pk})
+        url = reverse("update_comment", kwargs={"pk": self.comment.pk})
         data = {
             "content": "Updated comment by another user",
         }
         response = self.client.put(url, data, format="json")
 
-
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        assert response.data == {'message': 'You do not have ownership rights to update this comment'}
+        assert response.data == {
+            "message": "You do not have ownership rights to update this comment"
+        }
