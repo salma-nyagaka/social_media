@@ -92,11 +92,11 @@ To improve performance and scalability, caching mechanisms via the Redis server 
    EMAIL_HOST_USER="salmanyagaka@gmail.com"
    EMAIL_HOST_PASSWORD="oycj urnx ceiw rexn"
    DEFAULT_FROM_EMAIL="salmanyagaka@gmail.com"
-   DATABASE_NAME='your_db_name'
-   DATABASE_USER='your_db_user'
-   DATABASE_PASSWORD='your_db_pass'
    DATABASE_HOST="db"
    DATABASE_PORT='5432'
+   POSTGRES_USER='salmanyagaka'
+   POSTGRES_PASSWORD='salma'
+   POSTGRES_DB='social_media_project'
    DSN="https://4f59239970b87c64005a1439e5d93405@o4507386132889600.ingest.us.sentry.io/4507386135314432"
    ```
 
