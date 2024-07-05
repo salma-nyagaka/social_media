@@ -365,48 +365,32 @@ class CommentViewSet(viewsets.ViewSet):
 
     def list(self, request, post_pk=None):
         """
-        Retrieve all comments or comments for a specific post.
+        Retrieve comments for a specific post.
         """
         try:
-            if post_pk is not None:
-                # Try to fetch comments for a specific post
-                try:
-                    post = Post.objects.get(pk=post_pk)
-                except Post.DoesNotExist:
-                    error_response = {
-                        "message": "Something went wrong",
-                        "errors": "Post does not exist",
-                    }
-                    return Response(error_response, status=status.HTTP_404_NOT_FOUND)
+            # Try to fetch comments for a specific post
+            post = Post.objects.get(pk=post_pk)
+        
+            cache_key = f"comments_post_{post_pk}"
+            cached_comments = cache.get(cache_key)
+            if cached_comments is not None:
+                return Response(cached_comments, status=status.HTTP_200_OK)
 
-                cache_key = f"comments_post_{post_pk}"
-                cached_comments = cache.get(cache_key)
-                if cached_comments is not None:
-                    return Response(cached_comments, status=status.HTTP_200_OK)
+            queryset = Comment.objects.filter(post=post)
+            serializer = CommentSerializer(queryset, many=True)
+            response_data = {
+                "message": f"Comments for post retrieved successfully",
+                "data": serializer.data,
+            }
+            cache.set(cache_key, response_data, timeout=60 * 15)
+            return Response(response_data, status=status.HTTP_200_OK)
 
-                queryset = Comment.objects.filter(post=post)
-                serializer = CommentSerializer(queryset, many=True)
-                response_data = {
-                    "message": f"Comments for post retrieved successfully",
-                    "data": serializer.data,
-                }
-                cache.set(cache_key, response_data, timeout=60 * 15)
-                return Response(response_data, status=status.HTTP_200_OK)
-            else:
-                # Fetch all comments
-                cache_key = "comments_list"
-                cached_comments = cache.get(cache_key)
-                if cached_comments is not None:
-                    return Response(cached_comments, status=status.HTTP_200_OK)
-
-                queryset = Comment.objects.all()
-                serializer = CommentSerializer(queryset, many=True)
-                response_data = {
-                    "message": "Comments retrieved successfully",
-                    "data": serializer.data,
-                }
-                cache.set(cache_key, response_data, timeout=60 * 15)
-                return Response(response_data, status=status.HTTP_200_OK)
+        except Post.DoesNotExist:
+            error_response = {
+                "message": "Something went wrong",
+                "errors": "Post does not exist",
+            }
+            return Response(error_response, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             error_response = {
                 "message": "Something went wrong",
@@ -462,7 +446,7 @@ class CommentViewSet(viewsets.ViewSet):
                 serializer.save()
                 cache.delete(f"comment_{pk}")
                 cache.delete("comments_list")
-                cache.delete(f"post_{comment.post.id}")
+                cache.delete(f"comments_post_{comment.post.id}")
                 cache.delete("posts_list")
                 response_data = {
                     "message": "Comment updated successfully",
@@ -498,7 +482,7 @@ class CommentViewSet(viewsets.ViewSet):
         comment.delete()
         cache.delete(f"comment_{pk}")
         cache.delete("comments_list")
-        cache.delete(f"post_{comment.post.id}")
+        cache.delete(f"comments_post_{comment.post.id}")
         cache.delete("posts_list")
         return Response(
             {"message": "Comment deleted successfully"},
@@ -545,8 +529,9 @@ class CommentViewSet(viewsets.ViewSet):
             }
             # Invalidate the comments list and related post caches
             cache.delete("comments_list")
-            cache.delete(f"post_{comment.post.id}")
+            cache.delete(f"comments_post_{comment.post.id}")
             cache.delete("posts_list")
+            cache.delete(f"comments_post_{comment.post.id}")
             return Response(response_data, status=status.HTTP_201_CREATED)
         except Exception as e:
             error_response = {
