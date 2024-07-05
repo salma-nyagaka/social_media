@@ -29,6 +29,12 @@ COPY wait-for-it.sh /wait-for-it.sh
 # Make the wait-for-it script executable
 RUN chmod +x /wait-for-it.sh
 
+# Copy the wait-for-it script into the container
+COPY restart_rabbitmq.sh /restart_rabbitmq.sh
+
+# Make the wait-for-it script executable
+RUN chmod +x /restart_rabbitmq.sh
+
 # Verify Gunicorn installation
 RUN gunicorn --version
 
