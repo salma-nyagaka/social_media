@@ -8,10 +8,10 @@ docker stop $(docker ps -a -q) || true
 docker rm $(docker ps -a -q) || true
 
 # Remove all Docker volumes
-docker volume rm $(docker volume ls -q) || true
+# docker volume rm $(docker volume ls -q) || true
 
 # Remove all Docker networks
-docker network rm $(docker network ls -q) || true
+# docker network rm $(docker network ls -q) || true
 
 # Remove unused Docker resources including networks, images, containers, and volumes
 docker system prune -a -f --volumes
