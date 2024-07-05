@@ -24,11 +24,12 @@ urlpatterns = [
     path("", create_post, name="create_post"),
     path("<int:post_id>/", retrieve, name="retrieve"),
     path("all/", retrieve_all, name="retrieve_all"),
+    path("all/<int:user_id>/", retrieve_all, name="retrieve_all"),
     path("delete/<int:pk>/", delete_post, name="delete_post"),
     path("update/<int:pk>/", update_post, name="update_post"),
     path("comments/", create_comment, name="create_comment"),
     path("comments/<int:pk>/", retrieve_comment, name="retrieve_comment"),
-    path("comments/all/<int:post_pk>", list_comments, name="list_comments"),
+    path("comments/all/<int:post_pk>/", list_comments, name="list_comments"),
     path("comments/update/<int:pk>/", update_comment, name="update_comment"),
     path("comments/delete/<int:pk>/", delete_comment, name="delete_comment"),
 ]
