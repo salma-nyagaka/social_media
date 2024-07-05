@@ -11,6 +11,7 @@ retrieve_all = BlogPostViewSet.as_view({"get": "list"})
 delete_post = BlogPostViewSet.as_view({"delete": "destroy"})
 update_post = BlogPostViewSet.as_view({"put": "update"})
 
+
 # Individual views for each action on BlogPostViewSet CommentViewSet
 list_comments = CommentViewSet.as_view({"get": "list"})
 create_comment = CommentViewSet.as_view({"post": "create"})
@@ -26,8 +27,8 @@ urlpatterns = [
     path("delete/<int:pk>/", delete_post, name="delete_post"),
     path("update/<int:pk>/", update_post, name="update_post"),
     path("comments/", create_comment, name="create_comment"),
-    path("comments/all/", list_comments, name="list_comments"),
     path("comments/<int:pk>/", retrieve_comment, name="retrieve_comment"),
-    path("comments/update/<int:comment_id>/", update_comment, name="update_comment"),
-    path("comments/delete/<int:comment_id>/", delete_comment, name="delete_comment"),
+    path("comments/all/<int:post_pk>", list_comments, name="list_comments"),
+    path("comments/update/<int:pk>/", update_comment, name="update_comment"),
+    path("comments/delete/<int:pk>/", delete_comment, name="delete_comment"),
 ]

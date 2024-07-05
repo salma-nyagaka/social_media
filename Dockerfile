@@ -13,6 +13,9 @@ RUN apt-get update && apt-get install -y \
 # Set the working directory in the container
 WORKDIR /app
 
+# Copy the .env file into the image
+COPY .env /app/.env
+
 # Copy the requirements file into the container
 COPY requirements.txt .
 
@@ -31,6 +34,7 @@ RUN gunicorn --version
 
 # Copy the rest of your application code into the container
 COPY . .
+
 
 # Command to run your application
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "social_media_project.wsgi:application"]

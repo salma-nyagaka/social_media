@@ -36,9 +36,7 @@ ROOT_URLCONF = "social_media_project.urls"
 
 
 ALLOWED_HOSTS = [
-    '52.16.108.18',
-    "127.0.0.1",
-    "localhost",
+    '*',
 ]
 
 
@@ -98,9 +96,9 @@ WSGI_APPLICATION = "social_media_project.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv('DATABASE_NAME', ''),
-        "USER": os.getenv('DATABASE_USER', ''),
-        "PASSWORD": os.getenv('DATABASE_PASSWORD', ''),
+        "NAME": os.getenv('POSTGRES_DB', ''),
+        "USER": os.getenv('POSTGRES_USER', ''),
+        "PASSWORD": os.getenv('POSTGRES_PASSWORD', ''),
         "HOST":os.getenv('DATABASE_HOST', ''),
         "PORT": "5432",
     }

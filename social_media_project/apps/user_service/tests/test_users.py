@@ -13,6 +13,8 @@ from social_media_project.apps.user_service.serializers import (
     UserUpdateSerializer,
     UserSerializer,
 )
+
+
 @pytest.mark.django_db
 class TestUserAPI:
     """
@@ -107,7 +109,6 @@ class TestUserAPI:
         assert response.status_code == 200
         assert response.data["data"]["email"] == "updatedemail@example.com"
 
-
     def test_nonexistant_update_user(self):
         """
         Test updating a non-existent user.
@@ -129,7 +130,7 @@ class TestUserAPI:
         response = self.client.delete(url)
 
         assert response.status_code == 204
-        
+
     def test_user_cannot_delete_other_profile(self):
         """
         Ensure a user cannot delete another user's profile.
@@ -138,7 +139,9 @@ class TestUserAPI:
         response = self.client.delete(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        assert response.data == {"message": "You do not have permission to delete this profile."}
+        assert response.data == {
+            "message": "You do not have permission to delete this profile."
+        }
 
     def test_delete_user_not_exist(self):
         """
@@ -197,7 +200,7 @@ class TestUserAPI:
         assert response.status_code == status.HTTP_200_OK
         self.user.refresh_from_db()
         assert self.user.is_active
-        
+
     def test_get_serializer_class_create(self):
         """
         Test get_serializer_class method for the 'create' action.
@@ -219,7 +222,6 @@ class TestUserAPI:
         serializer_class = view.get_serializer_class()
 
         assert serializer_class == UserUpdateSerializer
-
 
     def test_get_serializer_class_partial_update(self):
         """
@@ -243,16 +245,20 @@ class TestUserAPI:
 
         assert serializer_class == UserSerializer
 
-
     def test_user_cannot_edit_other_profile(self):
         """
         Ensure a user cannot edit another user's profile.
         """
         url = reverse("update_user", args=[self.user2.pk])
-        response = self.client.patch(url, {
-            "username": "newusername",
-            "email": "newemail@example.com",
-        })
-        
+        response = self.client.patch(
+            url,
+            {
+                "username": "newusername",
+                "email": "newemail@example.com",
+            },
+        )
+
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        assert response.data == {"message": "You do not have permission to edit this profile."}
+        assert response.data == {
+            "message": "You do not have permission to edit this profile."
+        }

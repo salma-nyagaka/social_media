@@ -1,8 +1,9 @@
 #!/bin/bash
-# Navigate to project directory
-cd /opt/twiga/social_media
-docker-compose run web python manage.py makemigrations
-docker-compose run web python manage.py migrate
 
-# Start Docker containers
-docker-compose up --build -d
+# Navigate to the project directory
+cd /opt/twiga/social_media
+
+# Run the new container
+docker-compose down
+docker-compose build
+docker-compose up -d
