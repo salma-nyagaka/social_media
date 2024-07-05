@@ -237,7 +237,7 @@ CACHES = {
 
 
 sentry_sdk.init(
-    dsn=os.getenv('DSN', ''),
+    dsn='https://ee22bcedcbbb12468b3a29839421fc44@o4507386132889600.ingest.us.sentry.io/4507548360245248',
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     traces_sample_rate=1.0,
