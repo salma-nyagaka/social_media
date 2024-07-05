@@ -175,9 +175,10 @@ class BlogPostViewSet(viewsets.ViewSet):
             # Get the email addresses of the users who follow the author of the post
             receiver_emails = list(
                 User.objects.filter(
-                    is_active=True, followers__user_id=self.request.user.id
+                    is_active=True, following__following_user_id=self.request.user.id
                 ).values_list("email", flat=True)
             )
+         
 
             # Send email notification after post is created
             send_batch_notifications.delay(
@@ -200,161 +201,6 @@ class BlogPostViewSet(viewsets.ViewSet):
         cache.delete("posts_list")
 
         return Response(response_data, status=status.HTTP_201_CREATED)
-
-
-# class CommentViewSet(viewsets.ViewSet):
-#     """
-#     A viewset for viewing and editing blog comment instances.
-#     """
-
-#     permission_classes = [IsAuthenticated]
-
-#     def list(self, request,pk=None):
-#         """
-#         Retrieve all comments.
-#         """
-#         cache_key = "comments_list"
-#         cached_comments = cache.get(cache_key)
-#         if cached_comments is not None:
-#             return Response(cached_comments, status=status.HTTP_200_OK)
-
-#         queryset = Comment.objects.all()
-#         serializer = CommentSerializer(queryset, many=True)
-#         response_data = {
-#             "message": "Comments retrieved successfully",
-#             "data": serializer.data,
-#         }
-#         cache.set(cache_key, response_data, timeout=60 * 15)
-#         return Response(response_data, status=status.HTTP_200_OK)
-
-#     def create(self, request):
-#         """
-#         Create a new comment.
-#         """
-#         serializer = CommentSerializer(data=request.data)
-#         if serializer.is_valid():
-#             return self.perform_create(serializer)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#     def retrieve(self, request, pk=None):
-#         """
-#         Retrieves a single comment.
-#         """
-
-#         cache_key = f"comment_{pk}"
-#         cached_comment = cache.get(cache_key)
-#         if cached_comment is not None:
-#             return Response(cached_comment, status=status.HTTP_200_OK)
-
-#         try:
-#             comment = Comment.objects.get(pk=pk)
-#         except Comment.DoesNotExist:
-#             return Response(status=status.HTTP_404_NOT_FOUND)
-#         serializer = CommentSerializer(comment)
-#         response_data = {
-#             "message": "Comment retrieved successfully",
-#             "data": serializer.data,
-#         }
-#         cache.set(cache_key, response_data, timeout=60 * 15)
-#         return Response(response_data, status=status.HTTP_200_OK)
-
-#     def update(self, request, comment_id=None):
-#         """
-#         Update an existing comment.
-#         """
-
-#         try:
-#             comment = Comment.objects.get(pk=comment_id)
-#             if comment.user != request.user:
-#                 error_response = {"message": "You do not have ownership rights to update this comment"}
-#                 return Response(error_response, status=status.HTTP_403_FORBIDDEN)
-
-#             serializer = CommentSerializer(comment, data=request.data)
-#             if serializer.is_valid():
-#                 serializer.save()
-#                 cache.delete(f"comment_{comment_id}")
-#                 cache.delete("comments_list")
-#                 response_data = {
-#                     "message": "Comment updated successfully",
-#                     "data": serializer.data,
-#                 }
-
-#                 cache.set(f"comment_{comment_id}", response_data, timeout=60 * 15)
-#                 return Response(response_data, status=status.HTTP_200_OK)
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#         except Comment.DoesNotExist as e:
-#             error_response = {"message": "Something went wrong", "errors": str(e)}
-#             return Response(error_response, status=status.HTTP_404_NOT_FOUND)
-
-#     def destroy(self, request, comment_id=None):
-#         """
-#         Delete a comment.
-#         """
-#         try:
-#             comment = Comment.objects.get(pk=comment_id)
-#             if comment.user != request.user:
-#                 error_response = {"message": "You do not have ownership rights to delete this comment"}
-#                 return Response(error_response, status=status.HTTP_403_FORBIDDEN)
-#         except Comment.DoesNotExist as e:
-#             error_response = {"message": "Something went wrong", "errors": str(e)}
-#             return Response(error_response, status=status.HTTP_404_NOT_FOUND)
-#         comment.delete()
-#         cache.delete(f"comment_{comment_id}")
-#         cache.delete("comments_list")
-#         return Response(
-#             {"message": "Comment deleted successfully"},
-#             status=status.HTTP_204_NO_CONTENT,
-#         )
-
-#     def perform_create(self, serializer):
-#         """
-#         Save the comment with the current user as the author and send notifications.
-#         """
-#         try:
-#             post = serializer.validated_data.get("post", "no post")
-#             content = serializer.validated_data.get("content", "no content")
-#             comment_id = serializer.validated_data.get("id", "no comment")
-#             # Save the comment and get the ID from the saved instance
-#             comment = serializer.save(user=self.request.user)
-#             comment_id = comment.id
-
-#             if post.title:
-#                 # Get the email addresses of the users who follow the author of the post
-#                 receiver_emails = list(
-#                     User.objects.filter(
-#                         is_active=True,
-#                         followers__user_id=self.request.user.id
-#                     ).values_list("email", flat=True)
-#                 )
-
-#                 send_batch_notifications.delay(
-#                     subject="New comment has been added to the post: {}".format(
-#                         post.title
-#                     ),
-#                     message=content,
-#                     recipient_list=receiver_emails,
-#                     context={
-#                         "post_url": "{}/blogs/{}/".format(
-#                             settings.DOMAIN_NAME, comment_id
-#                         )
-#                     },
-#                     html_template="new_comment.html",
-#                     notification_type="comment",
-#                 )
-#             response_data = {
-#                 "message": "Comment created successfully",
-#                 "data": serializer.data,
-#             }
-#             # Invalidate the comments list cache
-#             cache.delete("comments_list")
-#             return Response(response_data, status=status.HTTP_201_CREATED)
-#         except Exception as e:
-#             error_response = {
-#                 "message": "Something went wrong",
-#                 "errors": {"detail": str(e)},
-#             }
-#             return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
-
 
 class CommentViewSet(viewsets.ViewSet):
     """
@@ -505,7 +351,7 @@ class CommentViewSet(viewsets.ViewSet):
                 # Get the email addresses of the users who follow the author of the post
                 receiver_emails = list(
                     User.objects.filter(
-                        is_active=True, followers__user_id=self.request.user.id
+                        is_active=True, following__following_user_id=self.request.user.id
                     ).values_list("email", flat=True)
                 )
 
