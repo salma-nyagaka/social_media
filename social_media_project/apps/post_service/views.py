@@ -18,13 +18,21 @@ class BlogPostViewSet(viewsets.ViewSet):
 
     permission_classes = [IsAuthenticated]
 
-    def list(self, request):
-        cache_key = "posts_list"
+    def list(self, request, user_id=None):
+        if user_id:
+            cache_key = f"posts_list_user_{user_id}"
+        else:
+            cache_key = "posts_list"
+            
         cached_posts = cache.get(cache_key)
         if cached_posts is not None:
             return Response(cached_posts, status=status.HTTP_200_OK)
 
-        queryset = Post.objects.all()
+        if user_id:
+            queryset = Post.objects.filter(user_id=user_id)
+        else:
+            queryset = Post.objects.all()
+            
         serializer = PostSerializer(queryset, many=True)
         response_data = {
             "message": "Post retrieved successfully",
@@ -99,6 +107,7 @@ class BlogPostViewSet(viewsets.ViewSet):
             serializer = PostSerializer(post, data=request.data)
             if serializer.is_valid():
                 serializer.save()
+                cache.delete(f"posts_list_user_{request.user.id}")
                 cache.delete(f"post_{pk}")
                 cache.delete("posts_list")
                 response_data = {
@@ -136,7 +145,9 @@ class BlogPostViewSet(viewsets.ViewSet):
                     "message": "You do not have ownership rights to delete this post."
                 }
                 return Response(error_response, status=status.HTTP_403_FORBIDDEN)
-
+            cache.delete(f"posts_list_user_{request.user.id}")
+            cache.delete(f"post_{pk}")
+            cache.delete("posts_list")
         except Post.DoesNotExist as e:
             error_response = {"message": "Something went wrong", "errors": str(e)}
             return Response(error_response, status=status.HTTP_404_NOT_FOUND)

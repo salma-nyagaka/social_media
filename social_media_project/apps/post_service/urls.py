@@ -24,6 +24,7 @@ urlpatterns = [
     path("", create_post, name="create_post"),
     path("<int:post_id>/", retrieve, name="retrieve"),
     path("all/", retrieve_all, name="retrieve_all"),
+    path("all/<int:user_id>/", retrieve_all, name="retrieve_all"),
     path("delete/<int:pk>/", delete_post, name="delete_post"),
     path("update/<int:pk>/", update_post, name="update_post"),
     path("comments/", create_comment, name="create_comment"),
