@@ -194,7 +194,8 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "")
 
 # settings.py
 # CELERY_BROKER_URL = "amqp://localhost"
-CELERY_BROKER_URL = 'amqp://salmanyagaka:salma@rabbitmq:5672//'
+# CELERY_BROKER_URL = 'amqp://salmanyagaka:salma@rabbitmq:5672//'
+CELERY_BROKER_URL = 'kafka://kafka:9092'
 
 CELERY_RESULT_BACKEND = "rpc://"
 CELERY_ACCEPT_CONTENT = ["json"]
@@ -225,24 +226,10 @@ CACHES = {
 #     }
 # }
 
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django_redis.cache.RedisCache',
-#         'LOCATION': 'redis://redis:6379/1',
-#         'OPTIONS': {
-#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-#         }
-#     }
-# }
+
 
 
 sentry_sdk.init(
     dsn='https://ee22bcedcbbb12468b3a29839421fc44@o4507386132889600.ingest.us.sentry.io/4507548360245248',
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    traces_sample_rate=1.0,
-    # Set profiles_sample_rate to 1.0 to profile 100%
-    # of sampled transactions.
-    # We recommend adjusting this value in production.
     profiles_sample_rate=1.0,
 )
