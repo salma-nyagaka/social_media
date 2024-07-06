@@ -195,6 +195,9 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "")
 # settings.py
 # CELERY_BROKER_URL = "amqp://localhost"
 # CELERY_BROKER_URL = 'amqp://salmanyagaka:salma@rabbitmq:5672//'
+# KAFKA_BROKER = os.environ.get('KAFKA_BROKER', 'localhost:9092')
+
+
 CELERY_BROKER_URL = 'kafka://kafka:9092'
 
 CELERY_RESULT_BACKEND = "rpc://"
@@ -226,7 +229,6 @@ CACHES = {
 #     }
 # }
 
-KAFKA_BROKER = os.environ.get('KAFKA_BROKER', 'localhost:9092')
 
 
 
