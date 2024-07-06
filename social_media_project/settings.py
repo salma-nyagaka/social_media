@@ -226,6 +226,7 @@ CACHES = {
 #     }
 # }
 
+KAFKA_BROKER = os.environ.get('KAFKA_BROKER', 'localhost:9092')
 
 
 

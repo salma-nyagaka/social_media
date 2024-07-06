@@ -14,7 +14,7 @@ docker rm $(docker ps -a -q) || true
 # docker network rm $(docker network ls -q) || true
 
 # Remove unused Docker resources including networks, images, containers, and volumes
-docker system prune -a -f --volumes
+# docker system prune -a -f --volumes
 
 # Start and enable Docker
 sudo systemctl start docker
